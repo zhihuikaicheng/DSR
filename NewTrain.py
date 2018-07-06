@@ -18,21 +18,26 @@ import time
 import os
 from model import ft_net, ft_net_dense, PCB
 import json
+from utils.sampler import RandomIdentitySampler
 
-os.environ["CUDA_VISIBLE_DEVICES"]="2, 3"
+os.environ["CUDA_VISIBLE_DEVICES"]="2"
 
 image_dir = '/world/data-gpu-94/sysu-reid/person-reid-data/OPPO_partial_dataset_raw/training/'
 
-data_transform = transforms.Compose([  
+data_transform = transforms.Compose([
+    transforms.RandomHorizontalFlip(), 
     transforms.ToTensor(), # range [0, 255] -> [0.0,1.0]
-    transforms.Normalize(mean = (0.5, 0.5, 0.5), std = (0.5, 0.5, 0.5))
+    transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
     ])
 
 image_datasets = {}
 image_datasets['train'] = datasets.ImageFolder(os.path.join(image_dir), data_transform)
 
+pdb.set_trace()
+
 dataloaders = torch.utils.data.DataLoader(image_datasets['train'], batch_size=64,
-                                             shuffle=True, num_workers=8)
+                                            sampler=RandomIdentitySampler(image_datasets['train'].imgs),
+                                            num_workers=8)
 
 dataset_sizes = len(image_datasets['train'])
 
@@ -95,8 +100,11 @@ def train_model(model, critertion, optimizer, scheduler, num_epochs):
 
             outputs = model(inputs)
 
+            # DSR AND TRIPLET LOSS ADD IN HERE
+            #################################################
             _, preds = torch.max(outputs.data, 1)
             loss = critertion(outputs, labels)
+            #################################################
 
             loss.backward()
             optimizer.step()
