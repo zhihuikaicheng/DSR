@@ -29,12 +29,12 @@ class ClassBlock(nn.Module):
     def __init__(self, input_dim, class_num, dropout=True, relu=True, num_bottleneck=512):
         super(ClassBlock, self).__init__()
         add_block = []
+        if dropout:
+            add_block += [nn.Dropout(p=0.5)]
         add_block += [nn.Linear(input_dim, num_bottleneck)] 
         add_block += [nn.BatchNorm1d(num_bottleneck)]
         if relu:
             add_block += [nn.LeakyReLU(0.1)]
-        if dropout:
-            add_block += [nn.Dropout(p=0.5)]
         add_block = nn.Sequential(*add_block)
         add_block.apply(weights_init_kaiming)
 
@@ -79,7 +79,7 @@ class ft_net(nn.Module):
 class ft_net_dense(nn.Module):
 
     def __init__(self, class_num ):
-        super().__init__()
+        super(ft_net_dense, self).__init__()
         model_ft = models.densenet121(pretrained=True)
         model_ft.features.avgpool = nn.AdaptiveAvgPool2d((1,1))
         model_ft.fc = nn.Sequential()
@@ -197,9 +197,9 @@ class PCB_test(nn.Module):
 
 # debug model structure
 #net = ft_net(751)
-net = ft_net_dense(751)
-#print(net)
-input = Variable(torch.FloatTensor(8, 3, 224, 224))
-output = net(input)
-print('net output size:')
-print(output.shape)
+# net = ft_net_dense(751)
+# #print(net)
+# input = Variable(torch.FloatTensor(8, 3, 224, 224))
+# output = net(input)
+# print('net output size:')
+# print(output.shape)
