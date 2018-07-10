@@ -34,7 +34,7 @@ parser.add_argument('--margin', type=float, default=0.3)
 parser.add_argument('--num_epochs', type=int, default=60)
 parser.add_argument('--lr_decay_epochs', type=int, default=40)
 parser.add_argument('--steps_per_log', type=int, default=1)
-perser.add_argument('--model_save_dir', type=str)
+parser.add_argument('--model_save_dir', type=str)
 
 args = parser.parse_args()
 
