@@ -136,8 +136,8 @@ def train_model(model, optimizer, scheduler, num_epochs):
             # inputs = Variable(inputs.cuda())
             # labels = Variable(labels.cuda())
 
-            inputs = Variable(TVT(torch.from_numpy(inputs).float()))
-            labels = TVT(torch.from_numpy(labels).long())
+            inputs = Variable(TVT(inputs.float()))
+            labels = TVT(labels.long())
 
             optimizer.zero_grad()
 
