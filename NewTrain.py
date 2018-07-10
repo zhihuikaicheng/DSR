@@ -26,7 +26,7 @@ from utils.utils import AverageMeter
 from utils.loss import global_loss
 from utils.TripletLoss import TripletLoss
 from utils.utils import set_devices
-
+from torch.nn.parallel import DataParallel
 
 #args
 ##############################################
