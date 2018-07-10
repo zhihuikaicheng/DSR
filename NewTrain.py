@@ -170,19 +170,19 @@ def train_model(model, optimizer, scheduler, num_epochs):
             dist_ap_meter.update(d_ap)
             dist_an_meter.update(d_an)
             loss_meter.update(to_scalar(loss))
-            if step % args.steps_per_log == 0:
-                time_log = '\tStep {}/Ep {}, {:.2f}s'.format(
-                  step, ep + 1, time.time() - step_st, )
+            # if step % args.steps_per_log == 0:
+            #     time_log = '\tStep {}/Ep {}, {:.2f}s'.format(
+            #       step, ep + 1, time.time() - step_st, )
 
-                tri_log = (', prec {:.2%}, sm {:.2%}, '
-                       'd_ap {:.4f}, d_an {:.4f}, '
-                       'loss {:.4f}'.format(
-                prec_meter.val, sm_meter.val,
-                dist_ap_meter.val, dist_an_meter.val,
-                loss_meter.val, ))
+            #     tri_log = (', prec {:.2%}, sm {:.2%}, '
+            #            'd_ap {:.4f}, d_an {:.4f}, '
+            #            'loss {:.4f}'.format(
+            #     prec_meter.val, sm_meter.val,
+            #     dist_ap_meter.val, dist_an_meter.val,
+            #     loss_meter.val, ))
 
-                log = time_log + tri_log
-                print(log)
+            #     log = time_log + tri_log
+            #     print(log)
 
         #     running_loss += loss.data[0]
         #     running_corrects += torch.sum(preds == labels.data)
