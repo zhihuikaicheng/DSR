@@ -50,7 +50,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu_use
 image_dir = args.dataset_dir
 
 data_transform = transforms.Compose([
-    transforms.RectScale(args.img_h, args.img_w)
+    transforms.RectScale(args.img_h, args.img_w),
     transforms.RandomHorizontalFlip(), 
     transforms.ToTensor(), # range [0, 255] -> [0.0,1.0]
     transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
