@@ -195,7 +195,7 @@ def train_model(model, optimizer, scheduler, num_epochs):
         # y_loss.append(epoch_loss)
         # y_err.append(1.0 - epoch_acc)
 
-        time_log = 'Ep {}, {:.2f}s'.format(ep + 1, time.time() - ep_st)
+        time_log = 'Ep {}, {:.2f}s'.format(epoch + 1, time.time())
 
         tri_log = (', prec {:.2%}, sm {:.2%}, '
                'd_ap {:.4f}, d_an {:.4f}, '
