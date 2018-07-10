@@ -22,10 +22,11 @@ import json
 from utils.sampler import RandomIdentitySampler
 from utils.resnet import resnet50
 from utils.Model import Model
-from utils.utils import AverageMeter
-from utils.loss import global_loss
 from utils.TripletLoss import TripletLoss
+from utils.loss import global_loss
+from utils.utils import AverageMeter
 from utils.utils import set_devices
+from utils.utils import to_scalar
 from torch.nn.parallel import DataParallel
 
 #args
