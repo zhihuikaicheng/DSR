@@ -5,6 +5,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import pdb
+import time
 from torch.optim import lr_scheduler
 from torch.autograd import Variable
 import numpy as np
@@ -19,6 +20,9 @@ import os
 from model import ft_net, ft_net_dense, PCB
 import json
 from utils.sampler import RandomIdentitySampler
+from utils.resnet import resnet50
+from utils.Model import Model
+from utils.utils import AverageMeter
 
 os.environ["CUDA_VISIBLE_DEVICES"]="2"
 
@@ -43,7 +47,7 @@ dataset_sizes = len(image_datasets['train'])
 
 class_names = image_datasets['train'].classes
 
-print (len(class_names))
+# print (len(class_names))
 
 # pdb.set_trace()
 
@@ -52,10 +56,13 @@ inputs, classes = next(iter(dataloaders))
 y_loss = []
 y_err = []
 
-model = ft_net(len(class_names))
+# model = ft_net(len(class_names))
+model = Model()
 model = model.cuda()
 
-criterion = nn.CrossEntropyLoss()
+# criterion = nn.CrossEntropyLoss()
+margin=0.3
+tri_loss = TripletLoss(margin)
 
 ignored_params = list(map(id, model.model.fc.parameters() )) + list(map(id, model.classifier.parameters() ))
 
@@ -91,6 +98,12 @@ def train_model(model, critertion, optimizer, scheduler, num_epochs):
         running_loss = 0.0
         running_corrects = 0
 
+        prec_meter = AverageMeter()
+        sm_meter = AverageMeter()
+        dist_ap_meter = AverageMeter()
+        dist_an_meter = AverageMeter()
+        loss_meter = AverageMeter()
+
         for data in dataloaders:
             inputs, labels = data
             inputs = Variable(inputs.cuda())
@@ -98,27 +111,71 @@ def train_model(model, critertion, optimizer, scheduler, num_epochs):
 
             optimizer.zero_grad()
 
-            outputs = model(inputs)
+            outputs_x, outputs_spatialFeature = model(inputs) #TVT ???
 
             # DSR AND TRIPLET LOSS ADD IN HERE
             #################################################
-            _, preds = torch.max(outputs.data, 1)
-            loss = critertion(outputs, labels)
+            # _, preds = torch.max(outputs.data, 1)
+            # loss = critertion(outputs, labels)
+            loss, p_inds, n_inds, dist_ap, dist_an, dist_mat = global_loss(
+                tri_loss, outputs_x, outputs_spatialFeature, labels,
+                normalize_feature=False) 
+
             #################################################
 
             loss.backward()
             optimizer.step()
 
-            running_loss += loss.data[0]
-            running_corrects += torch.sum(preds == labels.data)
+            prec = (dist_an > dist_ap).data.float().mean()
+            # the proportion of triplets that satisfy margin
+            sm = (dist_an > dist_ap + margin).data.float().mean()
+            # average (anchor, positive) distance
+            d_ap = dist_ap.data.mean()
+            # average (anchor, negative) distance
+            d_an = dist_an.data.mean()
 
-        epoch_loss = running_loss / dataset_sizes
-        epoch_acc = running_corrects / dataset_sizes
+            prec_meter.update(prec)
+            sm_meter.update(sm)
+            dist_ap_meter.update(d_ap)
+            dist_an_meter.update(d_an)
+            loss_meter.update(to_scalar(loss))
+            if step % cfg.steps_per_log == 0:
+                time_log = '\tStep {}/Ep {}, {:.2f}s'.format(
+                  step, ep + 1, time.time() - step_st, )
 
-        print ('Loss: {:.4f} Acc: {:.4f}'.format(epoch_loss, epoch_acc))
+                tri_log = (', prec {:.2%}, sm {:.2%}, '
+                       'd_ap {:.4f}, d_an {:.4f}, '
+                       'loss {:.4f}'.format(
+                prec_meter.val, sm_meter.val,
+                dist_ap_meter.val, dist_an_meter.val,
+                loss_meter.val, ))
 
-        y_loss.append(epoch_loss)
-        y_err.append(1.0 - epoch_acc)
+                log = time_log + tri_log
+                print(log)
+
+        #     running_loss += loss.data[0]
+        #     running_corrects += torch.sum(preds == labels.data)
+
+        # epoch_loss = running_loss / dataset_sizes
+        # epoch_acc = running_corrects / dataset_sizes
+
+        # print ('Loss: {:.4f} Acc: {:.4f}'.format(epoch_loss, epoch_acc))
+
+        # y_loss.append(epoch_loss)
+        # y_err.append(1.0 - epoch_acc)
+
+        time_log = 'Ep {}, {:.2f}s'.format(ep + 1, time.time() - ep_st)
+
+        tri_log = (', prec {:.2%}, sm {:.2%}, '
+               'd_ap {:.4f}, d_an {:.4f}, '
+               'loss {:.4f}'.format(
+        prec_meter.avg, sm_meter.avg,
+        dist_ap_meter.avg, dist_an_meter.avg,
+        loss_meter.avg, ))
+
+        log = time_log + tri_log
+        print(log)
+
 
     # model.load_state_dict(model_weights)
     save_network(model, epoch)
