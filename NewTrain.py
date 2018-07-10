@@ -99,7 +99,7 @@ def save_network(network, epoch_label):
     torch.save(network.cpu().state_dict(), save_path)
 
 
-def train_model(model, critertion, optimizer, scheduler, num_epochs):
+def train_model(model, optimizer, scheduler, num_epochs):
 
     model_weights = model.state_dict()
 
@@ -197,5 +197,5 @@ def train_model(model, critertion, optimizer, scheduler, num_epochs):
     # model.load_state_dict(model_weights)
     save_network(model, epoch)
 
-model = train_model(model, criterion, optimizer_ft, exp_lr_scheduler,
+model = train_model(model, optimizer_ft, exp_lr_scheduler,
                        args.num_epochs)
