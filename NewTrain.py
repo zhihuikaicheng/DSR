@@ -24,6 +24,7 @@ from utils.resnet import resnet50
 from utils.Model import Model
 from utils.utils import AverageMeter
 from utils.loss import global_loss
+from utils.TripletLoss import TripletLoss
 
 #args
 ##############################################
