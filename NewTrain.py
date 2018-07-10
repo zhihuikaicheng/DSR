@@ -23,10 +23,28 @@ from utils.sampler import RandomIdentitySampler
 from utils.resnet import resnet50
 from utils.Model import Model
 from utils.utils import AverageMeter
+from utils.loss import global_loss
 
 os.environ["CUDA_VISIBLE_DEVICES"]="2"
 
-image_dir = '/world/data-gpu-94/sysu-reid/person-reid-data/OPPO_partial_dataset_raw/training/'
+#args
+##############################################
+parser = argparse.ArgumentParser()
+parser.add_argument('--gpu_use', type=str, default="2")
+parser.add_argument('--dataset_dir', type=str)
+parser.add_argument('--margin', type=float, default=0.3)
+parser.add_argument('--num_epochs', type=int, default=60)
+parser.add_argument('--lr_decay_epochs', type=int, default=40)
+parser.add_argument('--steps_per_log', type=int, default=1)
+
+args = parser.parse_args()
+
+##############################################
+
+
+#data input
+##############################################
+image_dir = args.dataset_dir
 
 data_transform = transforms.Compose([
     transforms.RandomHorizontalFlip(), 
@@ -37,8 +55,6 @@ data_transform = transforms.Compose([
 image_datasets = {}
 image_datasets['train'] = datasets.ImageFolder(os.path.join(image_dir), data_transform)
 
-pdb.set_trace()
-
 dataloaders = torch.utils.data.DataLoader(image_datasets['train'], batch_size=64,
                                             sampler=RandomIdentitySampler(image_datasets['train'].imgs),
                                             num_workers=8)
@@ -47,11 +63,9 @@ dataset_sizes = len(image_datasets['train'])
 
 class_names = image_datasets['train'].classes
 
-# print (len(class_names))
-
-# pdb.set_trace()
-
 inputs, classes = next(iter(dataloaders))
+
+##############################################
 
 y_loss = []
 y_err = []
@@ -61,7 +75,8 @@ model = Model()
 model = model.cuda()
 
 # criterion = nn.CrossEntropyLoss()
-margin=0.3
+margin = args.margin
+
 tri_loss = TripletLoss(margin)
 
 ignored_params = list(map(id, model.model.fc.parameters() )) + list(map(id, model.classifier.parameters() ))
@@ -74,7 +89,7 @@ optimizer_ft = optim.SGD([
              {'params': model.classifier.parameters(), 'lr': 0.1}
          ], weight_decay=5e-4, momentum=0.9, nesterov=True)
 
-exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=5, gamma=0.1)
+exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=args.lr_decay_epochs, gamma=0.1)
 
 def save_network(network, epoch_label):
     save_filename = 'net_%s.pth'% epoch_label
@@ -139,7 +154,7 @@ def train_model(model, critertion, optimizer, scheduler, num_epochs):
             dist_ap_meter.update(d_ap)
             dist_an_meter.update(d_an)
             loss_meter.update(to_scalar(loss))
-            if step % cfg.steps_per_log == 0:
+            if step % args.steps_per_log == 0:
                 time_log = '\tStep {}/Ep {}, {:.2f}s'.format(
                   step, ep + 1, time.time() - step_st, )
 
@@ -181,4 +196,4 @@ def train_model(model, critertion, optimizer, scheduler, num_epochs):
     save_network(model, epoch)
 
 model = train_model(model, criterion, optimizer_ft, exp_lr_scheduler,
-                       num_epochs=15)
+                       args.num_epochs)
