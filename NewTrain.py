@@ -19,11 +19,11 @@ import time
 import os
 from model import ft_net, ft_net_dense, PCB
 import json
-from utils.sampler import RandomIdentitySampler
-from utils.resnet import resnet50
-from utils.Model import Model
-from utils.utils import AverageMeter
-from utils.loss import global_loss
+from .utils.sampler import RandomIdentitySampler
+from .utils.resnet import resnet50
+from .utils.Model import Model
+from .utils.utils import AverageMeter
+from .utils.loss import global_loss
 
 os.environ["CUDA_VISIBLE_DEVICES"]="2"
 
