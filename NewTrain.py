@@ -25,11 +25,13 @@ from utils.Model import Model
 from utils.utils import AverageMeter
 from utils.loss import global_loss
 from utils.TripletLoss import TripletLoss
+from utils.utils import set_devices
+
 
 #args
 ##############################################
 parser = argparse.ArgumentParser()
-parser.add_argument('--gpu_use', type=str, default="2")
+parser.add_argument('--sys_device_ids', type=eval, default=(0,1,2,3))
 parser.add_argument('--dataset_dir', type=str)
 parser.add_argument('--margin', type=float, default=0.3)
 parser.add_argument('--num_epochs', type=int, default=60)
@@ -43,7 +45,7 @@ args = parser.parse_args()
 
 ##############################################
 
-os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu_use
+# os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu_use
 
 #data input
 ##############################################
@@ -76,7 +78,8 @@ y_err = []
 
 # model = ft_net(len(class_names))
 model = Model()
-model = model.cuda()
+
+TVT, TMO = set_devices(args.sys_device_ids)
 
 # criterion = nn.CrossEntropyLoss()
 margin = args.margin
@@ -95,6 +98,10 @@ optimizer_ft = optim.SGD([
          ], weight_decay=5e-4, momentum=0.9, nesterov=True)
 
 exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=args.lr_decay_epochs, gamma=0.1)
+
+model = DataParallel(model)
+
+model = model.cuda()
 
 def save_network(network, epoch_label):
     save_filename = 'net_%s.pth'% epoch_label
@@ -126,12 +133,15 @@ def train_model(model, optimizer, scheduler, num_epochs):
 
         for data in dataloaders:
             inputs, labels = data
-            inputs = Variable(inputs.cuda())
-            labels = Variable(labels.cuda())
+            # inputs = Variable(inputs.cuda())
+            # labels = Variable(labels.cuda())
+
+            inputs = Variable(TVT(torch.from_numpy(inputs).float()))
+            labels = TVT(torch.from_numpy(labels).long())
 
             optimizer.zero_grad()
 
-            outputs_x, outputs_spatialFeature = model(inputs) #TVT ???
+            outputs_x, outputs_spatialFeature = model(inputs) 
 
             # DSR AND TRIPLET LOSS ADD IN HERE
             #################################################

@@ -113,7 +113,7 @@ def hard_example_mining(dist_mat, labels, return_inds=False):
 
   if return_inds:
     # shape [N, N]
-    ind = (labels.resize_as_(labels)
+    ind = (labels.new().resize_as_(labels)
            .copy_(torch.arange(0, N).long())
            .unsqueeze( 0).expand(N, N))
     # shape [N, 1]
