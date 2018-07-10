@@ -34,6 +34,7 @@ parser.add_argument('--margin', type=float, default=0.3)
 parser.add_argument('--num_epochs', type=int, default=60)
 parser.add_argument('--lr_decay_epochs', type=int, default=40)
 parser.add_argument('--steps_per_log', type=int, default=1)
+perser.add_argument('--model_save_dir', type=str)
 
 args = parser.parse_args()
 
@@ -92,7 +93,7 @@ exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=args.lr_decay_epo
 
 def save_network(network, epoch_label):
     save_filename = 'net_%s.pth'% epoch_label
-    save_path = os.path.join('./model', 'ft_ResNet50', save_filename)
+    save_path = os.path.join(args.model_save_dir, save_filename)
     torch.save(network.cpu().state_dict(), save_path)
 
 
