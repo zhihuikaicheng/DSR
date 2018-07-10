@@ -36,6 +36,8 @@ parser.add_argument('--num_epochs', type=int, default=60)
 parser.add_argument('--lr_decay_epochs', type=int, default=40)
 parser.add_argument('--steps_per_log', type=int, default=1)
 parser.add_argument('--model_save_dir', type=str)
+parser.add_argument('--img_h', type=int, default=256)
+parser.add_argument('--img_w', type=int, default=256)
 
 args = parser.parse_args()
 
@@ -48,6 +50,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu_use
 image_dir = args.dataset_dir
 
 data_transform = transforms.Compose([
+    transforms.RectScale(args.img_h, args.img_w)
     transforms.RandomHorizontalFlip(), 
     transforms.ToTensor(), # range [0, 255] -> [0.0,1.0]
     transforms.Normalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
