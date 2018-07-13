@@ -26,9 +26,6 @@ from utils.TripletLoss import TripletLoss
 from utils.loss import global_loss
 from utils.utils import AverageMeter
 from utils.utils import set_devices
-from utils.utils import to_scalar
-from utils.utils import load_state_dict
-from utils.utils import load_ckpt
 from torch.nn.parallel import DataParallel
 
 #args
