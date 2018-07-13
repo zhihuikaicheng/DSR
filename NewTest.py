@@ -38,7 +38,7 @@ parser.add_argument('--sys_device_ids', type=eval, default=(0,1,2,3))
 parser.add_argument('--test_dir', type=str)
 parser.add_argument('--margin', type=float, default=0.3)
 parser.add_argument('--model_save_dir', type=str)
-parser.add_argument('--batchsize', default=128, type=int, help='batchsize')
+parser.add_argument('--batch_size', default=128, type=int, help='batch_size')
 parser.add_argument('--img_h', type=int, default=256)
 parser.add_argument('--img_w', type=int, default=256)
 parser.add_argument('--which_epoch',default='last', type=str, help='0,1,2,3...or last')
@@ -52,7 +52,7 @@ data_transforms = transforms.Compose([
 ])
 
 image_datasets = {x: datasets.ImageFolder(os.path.join(args.test_dir, x) ,data_transforms) for x in ['gallery','query']}
-dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=args.batchsize,
+dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=args.batch_size,
                                              shuffle=False, num_workers=16) for x in ['gallery','query']}
 
 class_names = image_datasets['query'].classes
@@ -74,33 +74,39 @@ def fliplr(img):
 
 def extract_feature(model,dataloaders):
     features = torch.FloatTensor()
-    count = 0
+    special_features = torch.FloatTensor()
+    # count = 0
     for data in dataloaders:
         img, label = data
         n, c, h, w = img.size()
-        count += n
+        
+        input_img = Variable(img.cuda())
+        f, sf = model(input_img).data.cpu()
+        # count += n
+
         # print(count)
-        ff = torch.FloatTensor(n,2048).zero_()
-        for i in range(2):
-            if (i == 1):
-                img = fliplr(img)
-            input_img = Variable(img.cuda())
-            outputs = model(input_img) 
-            f = outputs.data.cpu()
-            ff = ff + f
+        # ff = torch.FloatTensor(n,2048).zero_()
+        # for i in range(2):
+        #     if (i == 1):
+        #         img = fliplr(img)
+        #     input_img = Variable(img.cuda())
+        #     outputs = model(input_img) 
+        #     f = outputs.data.cpu()
+        #     ff = ff + f
 
-            fnorm = torch.norm(ff, p=2, dim=1, keepdim=True)
-            ff = ff.div(fnorm.expand_as(ff))
+        #     fnorm = torch.norm(ff, p=2, dim=1, keepdim=True)
+        #     ff = ff.div(fnorm.expand_as(ff))
 
-        features = torch.cat((features,ff), 0)
-    return features
+        features = torch.cat((features, f), 0)
+        special_features = torch.cat((special_features, sf), 0)
+    return features, special_features
 
 gallery_feature = extract_feature(model,dataloaders['gallery'])
 query_feature = extract_feature(model,dataloaders['query'])
 
 def get_id(img_path):
     labels = []
-    for path, v in img_path:
+    for path, _ in img_path:
         filename = path.split('_')[-1]
         label = filename[0:4]
         if label[0:2]=='-1':
@@ -116,9 +122,11 @@ gallery_label = get_id(gallery_path)
 query_label = get_id(query_path)
 
 # Save to Matlab for check
-result = {'gallery_f':gallery_feature.numpy(),'gallery_label':gallery_label,'query_f':query_feature.numpy(),'query_label':query_label}
-scipy.io.savemat('pytorch_result.mat',result)
+result_f = {'gallery_f':gallery_feature[0].numpy(),'gallery_label':gallery_label,'query_f':query_feature[0].numpy(),'query_label':query_label}
+scipy.io.savemat('pytorch_result.mat',result_f)
 
+result_sf = {'gallery_f':gallery_feature[1].numpy(),'gallery_label':gallery_label,'query_f':query_feature[1].numpy(),'query_label':query_label}
+scipy.io.savemat('pytorch_result_multiscale.mat',result_sf)
 
 # class ExtractFeature(object):
 #   """A function to be called in the val/test set, to extract features.
