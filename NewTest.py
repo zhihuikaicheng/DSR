@@ -61,8 +61,9 @@ def load_network(network):
     return network
 
 model = Model() #last_conv_stride=args.last_conv_stride
-model = load_network(model)
 model_w = DataParallel(model)
+model = load_network(model_w)
+
 
 # def fliplr(img):
 #     '''flip horizontal'''
