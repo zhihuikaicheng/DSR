@@ -61,8 +61,10 @@ def load_network(network):
     return network
 
 model = Model() #last_conv_stride=args.last_conv_stride
-model_w = DataParallel(model)
-model = load_network(model_w)
+TVT, TMO = set_devices(args.sys_device_ids)
+model = DataParallel(model)
+model.cuda()
+model = load_network(model)
 
 
 # def fliplr(img):
@@ -79,8 +81,8 @@ def extract_feature(model,dataloaders):
         img, label = data
         n, c, h, w = img.size()
         
-        input_img = Variable(img.cuda())
-        f, sf = model(input_img).data.cpu()
+        input_img = Variable(TVT(img.float()))
+        f, sf = model(input_img)
         # count += n
 
         # print(count)
