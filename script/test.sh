@@ -5,4 +5,4 @@ python NewTest.py \
 --batch_size=64 \
 --img_h=256 \
 --img_w=128 \
---which_epoch=59
+--which_epoch='59'
