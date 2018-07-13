@@ -58,13 +58,8 @@ dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=args
 class_names = image_datasets['query'].classes
 
 model = Model() #last_conv_stride=args.last_conv_stride
-optimizer_ft = optim.SGD([
-             {'params': base_params, 'lr': 0.01}
-             # {'params': model.model.fc.parameters(), 'lr': 0.1},
-             # {'params': model.classifier.parameters(), 'lr': 0.1}
-         ], weight_decay=5e-4, momentum=0.9, nesterov=True)
-
-# modules_optims = [model, optimizer_ft]
+model = load_network(model)
+model_w = DataParallel(model)
 
 def load_network(network):
     save_path = os.path.join('./model',name,'net_%s.pth'%opt.which_epoch)
@@ -99,6 +94,31 @@ def extract_feature(model,dataloaders):
 
         features = torch.cat((features,ff), 0)
     return features
+
+gallery_feature = extract_feature(model,dataloaders['gallery'])
+query_feature = extract_feature(model,dataloaders['query'])
+
+def get_id(img_path):
+    labels = []
+    for path, v in img_path:
+        filename = path.split('_')[-1]
+        label = filename[0:4]
+        if label[0:2]=='-1':
+            labels.append(-1)
+        else:
+            labels.append(int(label))
+    return labels
+
+gallery_path = image_datasets['gallery'].imgs
+query_path = image_datasets['query'].imgs
+
+gallery_label = get_id(gallery_path)
+query_label = get_id(query_path)
+
+# Save to Matlab for check
+result = {'gallery_f':gallery_feature.numpy(),'gallery_label':gallery_label,'query_f':query_feature.numpy(),'query_label':query_label}
+scipy.io.savemat('pytorch_result.mat',result)
+
 
 # class ExtractFeature(object):
 #   """A function to be called in the val/test set, to extract features.
