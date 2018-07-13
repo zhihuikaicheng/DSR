@@ -74,8 +74,8 @@ model = load_network(model)
 #     return img_flip
 
 def extract_feature(model,dataloaders):
-    features = torch.FloatTensor()
-    special_features = torch.FloatTensor()
+    features = []
+    special_features = []
     # count = 0
     for data in dataloaders:
         img, label = data
@@ -98,12 +98,18 @@ def extract_feature(model,dataloaders):
         #     fnorm = torch.norm(ff, p=2, dim=1, keepdim=True)
         #     ff = ff.div(fnorm.expand_as(ff))
 
-        features = torch.cat((features, f), 0)
-        special_features = torch.cat((special_features, sf), 0)
+        for i in range(args.batch_size):
+            features.append(f[i])
+            special_features.append(sf[i])
+
+
+        # features = torch.cat((features, f), 0)
+        # special_features = torch.cat((special_features, sf), 0)
     return features, special_features
 
 gallery_feature = extract_feature(model,dataloaders['gallery'])
 query_feature = extract_feature(model,dataloaders['query'])
+pdb.set_trace()
 
 def get_id(img_path):
     labels = []
