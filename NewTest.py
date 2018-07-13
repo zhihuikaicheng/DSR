@@ -59,7 +59,7 @@ class_names = image_datasets['query'].classes
 
 
 def load_network(network):
-    save_path = os.path.join(args.model_save_dir, 'net_%s.pth'%opt.which_epoch)
+    save_path = os.path.join(args.model_save_dir, 'net_%s.pth'%args.which_epoch)
     network.load_state_dict(torch.load(save_path))
     return network
 
