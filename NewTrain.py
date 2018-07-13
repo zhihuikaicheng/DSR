@@ -120,12 +120,13 @@ def train_model(model, optimizer, scheduler, num_epochs):
     best_acc = 0.0
 
     save_network(model, 0)
-    
+
     for epoch in range(num_epochs):
         print ('Now {} epochs, total {} epochs'.format(epoch, num_epochs))
         print ('*' * 12)
 
         scheduler.step()
+        model.cuda()
         model.train(True)
 
         running_loss = 0.0
@@ -142,8 +143,8 @@ def train_model(model, optimizer, scheduler, num_epochs):
             # inputs = Variable(inputs.cuda())
             # labels = Variable(labels.cuda())
 
-            inputs = Variable(TVT(inputs.float().cuda()))
-            labels = TVT(labels.long().cuda())
+            inputs = Variable(TVT(inputs.float()))
+            labels = TVT(labels.long())
 
             optimizer.zero_grad()
 
