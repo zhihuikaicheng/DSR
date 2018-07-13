@@ -107,6 +107,8 @@ model = model.cuda()
 def save_network(network, epoch_label):
     save_filename = 'net_%s.pth'% epoch_label
     save_path = os.path.join(args.model_save_dir, save_filename)
+    if not os.exist(args.model_save_dir):
+        os.mkdir(args.model_save_dir)
     torch.save(network.cpu().state_dict(), save_path)
 
 
@@ -207,8 +209,9 @@ def train_model(model, optimizer, scheduler, num_epochs):
         print(log)
 
 
-    # model.load_state_dict(model_weights)
-    save_network(model, epoch)
+        # model.load_state_dict(model_weights)
+        if (epoch + 1) % 10 == 0:
+            save_network(model, epoch)
 
 model = train_model(model, optimizer_ft, exp_lr_scheduler,
                        args.num_epochs)
