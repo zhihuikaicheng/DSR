@@ -41,6 +41,7 @@ parser.add_argument('--steps_per_log', type=int, default=1)
 parser.add_argument('--model_save_dir', type=str)
 parser.add_argument('--img_h', type=int, default=256)
 parser.add_argument('--img_w', type=int, default=256)
+parser.add_argument('--batch_size', type=int, default=128)
 
 args = parser.parse_args()
 
@@ -62,7 +63,7 @@ data_transform = transforms.Compose([
 image_datasets = {}
 image_datasets['train'] = datasets.ImageFolder(os.path.join(image_dir), data_transform)
 
-dataloaders = torch.utils.data.DataLoader(image_datasets['train'], batch_size=64,
+dataloaders = torch.utils.data.DataLoader(image_datasets['train'], batch_size=args.batch_size,
                                             sampler=RandomIdentitySampler(image_datasets['train'].imgs),
                                             num_workers=8)
 
