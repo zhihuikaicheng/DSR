@@ -107,7 +107,7 @@ model = model.cuda()
 def save_network(network, epoch_label):
     save_filename = 'net_%s.pth'% epoch_label
     save_path = os.path.join(args.model_save_dir, save_filename)
-    if not os.exist(args.model_save_dir):
+    if not os.path.exists(args.model_save_dir):
         os.mkdir(args.model_save_dir)
     torch.save(network.cpu().state_dict(), save_path)
 
