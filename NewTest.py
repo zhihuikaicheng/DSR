@@ -46,7 +46,7 @@ parser.add_argument('--which_epoch',default='last', type=str, help='0,1,2,3...or
 args = parser.parse_args()
 
 data_transforms = transforms.Compose([
-        transforms.Resize((img_h, img_w)),
+        transforms.Resize((args.img_h, args.img_w)),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
