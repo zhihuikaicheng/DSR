@@ -73,12 +73,27 @@ model = load_network(model)
 #     img_flip = img.index_select(3,inv_idx)
 #     return img_flip
 
-def extract_feature(model,dataloaders):
+def get_id(img_path):
+    labels = []
+    for path, _ in img_path:
+        filename = path.split('_')[-1]
+        label = filename[0:4]
+        if label[0:2]=='-1':
+            labels.append(-1)
+        else:
+            labels.append(int(label))
+    return labels
+
+def extract_feature(model,dataloaders,Is_gallery=True):
     features = []
     special_features = []
-    # count = 0
+    labels = []
+    count = 1
     for data in dataloaders:
-        img, label = data
+        # img, label = data
+        count += 1
+        img, _ = data
+        label = get_id(data.imgs)
         n, c, h, w = img.size()
         
         input_img = Variable(TVT(img.float()))
@@ -101,6 +116,24 @@ def extract_feature(model,dataloaders):
         for i in range(args.batch_size):
             features.append(f[i])
             special_features.append(sf[i])
+            labels.append(label[i])
+
+        if (count % 20 == 0):
+            part = int (count / 100)
+            if (Is_gallery):
+                result_f = {'gallery_f':features.numpy(),'gallery_label':labels}
+                scipy.io.savemat('pytorch_result_gallery_{:d}.mat'.format(part),result_f)
+                result_sf = {'gallery_f':special_features.numpy(),'gallery_label':labels}
+                scipy.io.savemat('pytorch_result_gallery_multi_{:d}.mat'.format(part),result_f)
+            else:
+                result_f = {'query_f':features.numpy(),'query_label':labels}
+                scipy.io.savemat('pytorch_result_query_{:d}.mat'.format(part),result_f)
+                result_sf = {'gallery_f':special_features.numpy(),'gallery_label':labels}
+                scipy.io.savemat('pytorch_result_query_multi_{:d}.mat'.format(part),result_f)
+            features = []
+            special_features = []
+            labels = []
+
 
 
         # features = torch.cat((features, f), 0)
@@ -108,32 +141,22 @@ def extract_feature(model,dataloaders):
     return features, special_features
 
 gallery_feature = extract_feature(model,dataloaders['gallery'])
-query_feature = extract_feature(model,dataloaders['query'])
-pdb.set_trace()
+query_feature = extract_feature(model,dataloaders['query'],Is_gallery=False)
+# pdb.set_trace()
 
-def get_id(img_path):
-    labels = []
-    for path, _ in img_path:
-        filename = path.split('_')[-1]
-        label = filename[0:4]
-        if label[0:2]=='-1':
-            labels.append(-1)
-        else:
-            labels.append(int(label))
-    return labels
 
-gallery_path = image_datasets['gallery'].imgs
-query_path = image_datasets['query'].imgs
+# gallery_path = image_datasets['gallery'].imgs
+# query_path = image_datasets['query'].imgs
 
-gallery_label = get_id(gallery_path)
-query_label = get_id(query_path)
+# gallery_label = get_id(gallery_path)
+# query_label = get_id(query_path)
 
 # Save to Matlab for check
-result_f = {'gallery_f':gallery_feature[0].numpy(),'gallery_label':gallery_label,'query_f':query_feature[0].numpy(),'query_label':query_label}
-scipy.io.savemat('pytorch_result.mat',result_f)
+# result_f = {'gallery_f':gallery_feature[0].numpy(),'gallery_label':gallery_label,'query_f':query_feature[0].numpy(),'query_label':query_label}
+# scipy.io.savemat('pytorch_result.mat',result_f)
 
-result_sf = {'gallery_f':gallery_feature[1].numpy(),'gallery_label':gallery_label,'query_f':query_feature[1].numpy(),'query_label':query_label}
-scipy.io.savemat('pytorch_result_multiscale.mat',result_sf)
+# result_sf = {'gallery_f':gallery_feature[1].numpy(),'gallery_label':gallery_label,'query_f':query_feature[1].numpy(),'query_label':query_label}
+# scipy.io.savemat('pytorch_result_multiscale.mat',result_sf)
 
 # class ExtractFeature(object):
 #   """A function to be called in the val/test set, to extract features.
