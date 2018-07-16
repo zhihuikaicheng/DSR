@@ -91,6 +91,7 @@ def extract_feature(model,dataloaders,Is_gallery=True):
     count = 1
     for data in dataloaders:
         # img, label = data
+        pdb.set_trace()
         count += 1
         img, _ = data
         label = get_id(data.imgs)
