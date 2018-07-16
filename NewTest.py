@@ -84,16 +84,16 @@ def get_id(img_path):
             labels.append(int(label))
     return labels
 
-def extract_feature(model,dataloaders,Is_gallery=True):
+def extract_feature(model,dataloaders,datasets,Is_gallery=True):
     features = []
     special_features = []
     labels = []
     count = 1
-    for (data, lab) in zip(dataloaders, dataloaders.imgs):
+    for (data, lab) in zip(dataloaders, datasets):
         # img, label = data
         count += 1
         img, _ = data
-        label = get_id(lab.imgs)
+        label = get_id(lab)
         n, c, h, w = img.size()
         
         input_img = Variable(TVT(img.float()))
@@ -140,8 +140,8 @@ def extract_feature(model,dataloaders,Is_gallery=True):
         # special_features = torch.cat((special_features, sf), 0)
     return features, special_features
 
-gallery_feature = extract_feature(model,dataloaders['gallery'])
-query_feature = extract_feature(model,dataloaders['query'],Is_gallery=False)
+gallery_feature = extract_feature(model,dataloaders['gallery'],image_datasets['gallery'].imgs)
+query_feature = extract_feature(model,dataloaders['query'],image_datasets['query'].imgs,Is_gallery=False)
 # pdb.set_trace()
 
 
