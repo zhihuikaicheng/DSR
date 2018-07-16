@@ -89,7 +89,7 @@ def extract_feature(model,dataloaders,datasets,Is_gallery=True):
     special_features = []
     labels = []
     count = 1
-    for (data, lab) in zip(dataloaders, datasets):
+    for (data, lab) in zip(dataloaders, datasets.items()):
         # img, label = data
         count += 1
         img, _ = data
