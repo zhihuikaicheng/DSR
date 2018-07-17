@@ -73,15 +73,25 @@ model = load_network(model)
 #     img_flip = img.index_select(3,inv_idx)
 #     return img_flip
 
+# def get_id(img_path):
+#     labels = []
+#     for path, _ in img_path:
+#         filename = path.split('_')[-1]
+#         label = filename[0:4]
+#         if label[0:2]=='-1':
+#             labels.append(-1)
+#         else:
+#             labels.append(int(label))
+#     return labels
+
 def get_id(img_path):
     labels = []
-    for path, _ in img_path:
-        filename = path.split('_')[-1]
-        label = filename[0:4]
-        if label[0:2]=='-1':
-            labels.append(-1)
-        else:
-            labels.append(int(label))
+    filename = img_path[0].split('_')[-1]
+    label = filename[0:4]
+    if label[0:2]=='-1':
+        labels.append(-1)
+    else:
+        labels.append(int(label))
     return labels
 
 def extract_feature(model,dataloaders,datasets,Is_gallery=True):
@@ -89,7 +99,7 @@ def extract_feature(model,dataloaders,datasets,Is_gallery=True):
     special_features = []
     labels = []
     count = 1
-    for (data, lab) in zip(dataloaders, datasets.items()):
+    for (data, lab) in zip(dataloaders, datasets.imgs):
         # img, label = data
         count += 1
         img, _ = data
@@ -119,7 +129,7 @@ def extract_feature(model,dataloaders,datasets,Is_gallery=True):
             labels.append(label[i])
 
         if (count % 20 == 0):
-            part = int (count / 100)
+            part = int (count / 20)
             if (Is_gallery):
                 result_f = {'gallery_f':features.numpy(),'gallery_label':labels}
                 scipy.io.savemat('pytorch_result_gallery_{:d}.mat'.format(part),result_f)
@@ -140,10 +150,9 @@ def extract_feature(model,dataloaders,datasets,Is_gallery=True):
         # special_features = torch.cat((special_features, sf), 0)
     return features, special_features
 
-gallery_feature = extract_feature(model,dataloaders['gallery'],image_datasets['gallery'].imgs)
-query_feature = extract_feature(model,dataloaders['query'],image_datasets['query'].imgs,Is_gallery=False)
+gallery_feature = extract_feature(model,dataloaders['gallery'],image_datasets['gallery'])
+query_feature = extract_feature(model,dataloaders['query'],image_datasets['query'],Is_gallery=False)
 # pdb.set_trace()
-
 
 # gallery_path = image_datasets['gallery'].imgs
 # query_path = image_datasets['query'].imgs
@@ -157,45 +166,3 @@ query_feature = extract_feature(model,dataloaders['query'],image_datasets['query
 
 # result_sf = {'gallery_f':gallery_feature[1].numpy(),'gallery_label':gallery_label,'query_f':query_feature[1].numpy(),'query_label':query_label}
 # scipy.io.savemat('pytorch_result_multiscale.mat',result_sf)
-
-# class ExtractFeature(object):
-#   """A function to be called in the val/test set, to extract features.
-#   Args:
-#     TVT: A callable to transfer images to specific device.
-#   """
-
-#   def __init__(self, model, TVT):
-#     self.model = model
-#     self.TVT = TVT
-
-#   def __call__(self, ims):
-#     old_train_eval_model = self.model.training
-#     # Set eval mode.
-#     # Force all BN layers to use global mean and variance, also disable
-#     # dropout.
-#     self.model.eval()
-#     ims = Variable(self.TVT(torch.from_numpy(ims).float()))
-#     feat, spatialFeature = self.model(ims)
-#     feat = feat.data.cpu().numpy()
-#     #feat1 = feat1.data.cpu().numpy()
-#     spatialFeature = spatialFeature.data.cpu().numpy()
-#     # Restore the model to its old train/eval mode.
-#     self.model.train(old_train_eval_model)
-#     return feat, spatialFeature
-
-# def test(load_model_weight=False):
-#     if load_model_weight:
-#         if args.model_save_dir != '':
-#             map_location = (lambda storage, loc: storage)
-#             sd = torch.load(args.model_save_dir, map_location=map_location)
-#             load_state_dict(model, sd)
-#             print('Loaded model weights from {}'.format(args.model_save_dir))
-#         else:
-#             load_ckpt(modules_optims, args.test_dir)
-
-#     for test_set, name in zip(test_sets, test_set_names):
-#         test_set.set_feat_func(ExtractFeature(model_w, TVT))
-#         print('\n=========> Test on dataset: {} <=========\n'.format(name))
-#         test_set.eval(
-#             normalize_feat=False, #normalize_feat=cfg.normalize_feature
-#             verbose=True)
