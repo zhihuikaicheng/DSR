@@ -91,7 +91,7 @@ def get_id(img_path):
     length = len(filename)
     label = ''
     for i in range(length):
-        if filename[length-i-1]='/':
+        if filename[length-i-1]=='/':
             break
         label = filename[length-i-1] + label
 
