@@ -99,11 +99,11 @@ def extract_feature(model,dataloaders,datasets,Is_gallery=True):
     special_features = []
     labels = []
     count = 1
-    for (data, lab) in zip(dataloaders, datasets.imgs):
+    for data in dataloaders:
         # img, label = data
         count += 1
         img, _ = data
-        label = get_id(lab)
+        label = get_id(data.imgs)
         n, c, h, w = img.size()
         
         input_img = Variable(TVT(img.float()))
