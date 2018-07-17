@@ -87,9 +87,15 @@ model = load_network(model)
 
 def get_id(img_path):
     labels = []
-    filename = img_path[0].split('_')[-1]
-    label = filename[0:4]
-    if label[0:2]=='-1':
+    filename = img_path[0].split('_')[0]
+    length = len(filename)
+    label = ''
+    for i in range(length):
+        if filename[length-i-1]='/':
+            break
+        label = filename[length-i-1] + label
+
+    if label=='-1':
         labels.append(-1)
     else:
         labels.append(int(label))
