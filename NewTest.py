@@ -129,23 +129,26 @@ def extract_feature(model,dataloaders,labelsloader,Is_gallery=True):
         #     ff = ff.div(fnorm.expand_as(ff))
 
         for i in range(args.batch_size):
-            features.append(f[i].numpy())
-            special_features.append(sf[i].numpy())
             lab = next(labelsloader)
             label = get_id(lab)
             labels.append(label)
-            
+        
+        features.append(f)
+        special_features.append(sf)
+
         if (count % 10 == 0):
             part = int (count / 10)
+            features = torch.cat(features, 0)
+            special_features = torch.cat(special_features, 0)
             if (Is_gallery):
-                result_f = {'gallery_f':features,'gallery_label':labels}
+                result_f = {'gallery_f':features.numpy(),'gallery_label':labels}
                 scipy.io.savemat('pytorch_result_gallery_{:d}.mat'.format(part),result_f)
-                result_sf = {'gallery_f':special_features,'gallery_label':labels}
+                result_sf = {'gallery_f':special_features.numpy(),'gallery_label':labels}
                 scipy.io.savemat('pytorch_result_gallery_multi_{:d}.mat'.format(part),result_f)
             else:
-                result_f = {'query_f':features,'query_label':labels}
+                result_f = {'query_f':features.numpy(),'query_label':labels}
                 scipy.io.savemat('pytorch_result_query_{:d}.mat'.format(part),result_f)
-                result_sf = {'gallery_f':special_features,'gallery_label':labels}
+                result_sf = {'gallery_f':special_features.numpy(),'gallery_label':labels}
                 scipy.io.savemat('pytorch_result_query_multi_{:d}.mat'.format(part),result_f)
             features = []
             special_features = []
