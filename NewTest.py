@@ -49,6 +49,7 @@ data_transforms = transforms.Compose([
 ])
 
 image_datasets = {x: datasets.ImageFolder(os.path.join(args.test_dir, x) ,data_transforms) for x in ['gallery','query']}
+labelsloader = {x: iter(image_datasets[x]) for x in ['gallery', 'query']}
 dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=args.batch_size,
                                              shuffle=False, num_workers=16) for x in ['gallery','query']}
 
@@ -94,16 +95,17 @@ def get_id(img_path):
         labels.append(int(label))
     return labels
 
-def extract_feature(model,dataloaders,datasets,Is_gallery=True):
+def extract_feature(model,dataloaders,labelsloader,Is_gallery=True):
     features = []
     special_features = []
     labels = []
     count = 1
     for data in dataloaders:
         # img, label = data
+        lab = next(labelsloader)
         count += 1
         img, _ = data
-        label = get_id(data.imgs)
+        label = get_id(lab)
         n, c, h, w = img.size()
         
         input_img = Variable(TVT(img.float()))
@@ -150,8 +152,8 @@ def extract_feature(model,dataloaders,datasets,Is_gallery=True):
         # special_features = torch.cat((special_features, sf), 0)
     return features, special_features
 
-gallery_feature = extract_feature(model,dataloaders['gallery'],image_datasets['gallery'])
-query_feature = extract_feature(model,dataloaders['query'],image_datasets['query'],Is_gallery=False)
+gallery_feature = extract_feature(model,dataloaders['gallery'],labelsloader['gallery'])
+query_feature = extract_feature(model,dataloaders['query'],labelsloader['query'],Is_gallery=False)
 # pdb.set_trace()
 
 # gallery_path = image_datasets['gallery'].imgs
