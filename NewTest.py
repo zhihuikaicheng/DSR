@@ -41,7 +41,7 @@ parser.add_argument('--img_h', type=int, default=256)
 parser.add_argument('--img_w', type=int, default=256)
 parser.add_argument('--which_epoch',default='last', type=str, help='0,1,2,3...or last')
 parser.add_argument('--gallery_feature_dir', type=str)
-parser.add_argument('--probe_feature_dir', type=str)
+parser.add_argument('--query_feature_dir', type=str)
 
 args = parser.parse_args()
 
@@ -139,9 +139,9 @@ def extract_feature(model,dataloaders,labelsloader,Is_gallery=True):
         features.append(f.data.cpu())
         special_features.append(sf.data.cpu())
 
-        if (count % 100 == 0):
+        if (count % 500 == 0):
             print(count * args.batch_size)
-            part = int (count / 100)
+            part = int (count / 500)
             features = torch.cat(features, 0)
             special_features = torch.cat(special_features, 0)
             if (Is_gallery):
@@ -151,14 +151,14 @@ def extract_feature(model,dataloaders,labelsloader,Is_gallery=True):
                 scipy.io.savemat(os.path.join(args.gallery_feature_dir, 'pytorch_result_gallery_multi_{:d}.mat'.format(part)),result_sf)
             else:
                 result_f = {'query_f':features.numpy(),'query_label':labels}
-                scipy.io.savemat(os.path.join(args.probe_feature_dir, 'pytorch_result_query_{:d}.mat'.format(part)),result_f)
+                scipy.io.savemat(os.path.join(args.query_feature_dir, 'pytorch_result_query_{:d}.mat'.format(part)),result_f)
                 result_sf = {'gallery_f':special_features.numpy(),'gallery_label':labels}
-                scipy.io.savemat(os.path.join(args.probe_feature_dir, 'pytorch_result_query_multi_{:d}.mat'.format(part)),result_sf)
+                scipy.io.savemat(os.path.join(args.query_feature_dir, 'pytorch_result_query_multi_{:d}.mat'.format(part)),result_sf)
             features = []
             special_features = []
             labels = []
 
-    part = int (count / 100 ) + 1
+    part = int (count / 500 ) + 1
     features = torch.cat(features, 0)
     special_features = torch.cat(special_features, 0)
     if (Is_gallery):
@@ -168,13 +168,19 @@ def extract_feature(model,dataloaders,labelsloader,Is_gallery=True):
         scipy.io.savemat(os.path.join(args.gallery_feature_dir, 'pytorch_result_gallery_multi_{:d}.mat'.format(part)),result_sf)
     else:
         result_f = {'query_f':features.numpy(),'query_label':labels}
-        scipy.io.savemat(os.path.join(args.probe_feature_dir, 'pytorch_result_query_{:d}.mat'.format(part)),result_f)
+        scipy.io.savemat(os.path.join(args.query_feature_dir, 'pytorch_result_query_{:d}.mat'.format(part)),result_f)
         result_sf = {'gallery_f':special_features.numpy(),'gallery_label':labels}
-        scipy.io.savemat(os.path.join(args.probe_feature_dir, 'pytorch_result_query_multi_{:d}.mat'.format(part)),result_sf)
+        scipy.io.savemat(os.path.join(args.query_feature_dir, 'pytorch_result_query_multi_{:d}.mat'.format(part)),result_sf)
         # features = torch.cat((features, f), 0)
         # special_features = torch.cat((special_features, sf), 0)
     return count
 
+if not os.path.exist(args.gallery_feature_dir):
+    os.makedirs(args.gallery_feature_dir)
+
+if not os.path.exist(args.query_feature_dir):
+    os.makedirs(args.query_feature_dir)
+    
 gallery_feature = extract_feature(model,dataloaders['gallery'],labelsloader['gallery'])
 query_feature = extract_feature(model,dataloaders['query'],labelsloader['query'],Is_gallery=False)
 # pdb.set_trace()
