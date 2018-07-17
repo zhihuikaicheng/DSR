@@ -86,7 +86,6 @@ model = load_network(model)
 #     return labels
 
 def get_id(img_path):
-    labels = []
     filename = img_path[0].split('_')[0]
     length = len(filename)
     label = ''
@@ -96,10 +95,9 @@ def get_id(img_path):
         label = filename[length-i-1] + label
 
     if label=='-1':
-        labels.append(-1)
+        return (-1)
     else:
-        labels.append(int(label))
-    return labels
+        return int(label)
 
 def extract_feature(model,dataloaders,labelsloader,Is_gallery=True):
     features = []
