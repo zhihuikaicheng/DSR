@@ -49,7 +49,7 @@ data_transforms = transforms.Compose([
 ])
 
 image_datasets = {x: datasets.ImageFolder(os.path.join(args.test_dir, x) ,data_transforms) for x in ['gallery','query']}
-labelsloader = {x: iter(image_datasets[x]) for x in ['gallery', 'query']}
+labelsloader = {x: iter(image_datasets[x].imgs) for x in ['gallery', 'query']}
 dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=args.batch_size,
                                              shuffle=False, num_workers=16) for x in ['gallery','query']}
 
