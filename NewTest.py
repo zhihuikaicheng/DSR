@@ -105,13 +105,12 @@ def extract_feature(model,dataloaders,labelsloader,Is_gallery=True):
     features = []
     special_features = []
     labels = []
-    count = 1
+    count = 0
     for data in dataloaders:
         # img, label = data
-        lab = next(labelsloader)
         count += 1
         img, _ = data
-        label = get_id(lab)
+        
         n, c, h, w = img.size()
         
         input_img = Variable(TVT(img.float()))
@@ -134,8 +133,10 @@ def extract_feature(model,dataloaders,labelsloader,Is_gallery=True):
         for i in range(args.batch_size):
             features.append(f[i])
             special_features.append(sf[i])
+            lab = next(labelsloader)
+            label = get_id(lab)
             labels.append(label[i])
-
+            
         if (count % 20 == 0):
             part = int (count / 20)
             if (Is_gallery):
@@ -151,8 +152,6 @@ def extract_feature(model,dataloaders,labelsloader,Is_gallery=True):
             features = []
             special_features = []
             labels = []
-
-
 
         # features = torch.cat((features, f), 0)
         # special_features = torch.cat((special_features, sf), 0)
