@@ -40,6 +40,8 @@ parser.add_argument('--batch_size', default=128, type=int, help='batch_size')
 parser.add_argument('--img_h', type=int, default=256)
 parser.add_argument('--img_w', type=int, default=256)
 parser.add_argument('--which_epoch',default='last', type=str, help='0,1,2,3...or last')
+parser.add_argument('--gallery_feature_dir', type=str)
+parser.add_argument('--probe_feature_dir', type=str)
 
 args = parser.parse_args()
 
@@ -52,7 +54,7 @@ data_transforms = transforms.Compose([
 image_datasets = {x: datasets.ImageFolder(os.path.join(args.test_dir, x) ,data_transforms) for x in ['gallery','query']}
 labelsloader = {x: iter(image_datasets[x].imgs) for x in ['gallery', 'query']}
 dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=args.batch_size,
-                                             shuffle=False, num_workers=16) for x in ['gallery','query']}
+                                             shuffle=False, num_workers=4, drop_last=True) for x in ['gallery','query']}
 
 class_names = image_datasets['query'].classes
 
@@ -137,27 +139,41 @@ def extract_feature(model,dataloaders,labelsloader,Is_gallery=True):
         features.append(f.data.cpu())
         special_features.append(sf.data.cpu())
 
-        if (count % 10 == 0):
-            part = int (count / 10)
+        if (count % 100 == 0):
+            print(count * args.batch_size)
+            part = int (count / 100)
             features = torch.cat(features, 0)
             special_features = torch.cat(special_features, 0)
             if (Is_gallery):
                 result_f = {'gallery_f':features.numpy(),'gallery_label':labels}
-                scipy.io.savemat('pytorch_result_gallery_{:d}.mat'.format(part),result_f)
+                scipy.io.savemat(os.path.join(args.gallery_feature_dir, 'pytorch_result_gallery_{:d}.mat'.format(part)),result_f)
                 result_sf = {'gallery_f':special_features.numpy(),'gallery_label':labels}
-                scipy.io.savemat('pytorch_result_gallery_multi_{:d}.mat'.format(part),result_f)
+                scipy.io.savemat(os.path.join(args.gallery_feature_dir, 'pytorch_result_gallery_multi_{:d}.mat'.format(part)),result_sf)
             else:
                 result_f = {'query_f':features.numpy(),'query_label':labels}
-                scipy.io.savemat('pytorch_result_query_{:d}.mat'.format(part),result_f)
+                scipy.io.savemat(os.path.join(args.probe_feature_dir, 'pytorch_result_query_{:d}.mat'.format(part)),result_f)
                 result_sf = {'gallery_f':special_features.numpy(),'gallery_label':labels}
-                scipy.io.savemat('pytorch_result_query_multi_{:d}.mat'.format(part),result_f)
+                scipy.io.savemat(os.path.join(args.probe_feature_dir, 'pytorch_result_query_multi_{:d}.mat'.format(part)),result_sf)
             features = []
             special_features = []
             labels = []
 
+    part = int (count / 100 ) + 1
+    features = torch.cat(features, 0)
+    special_features = torch.cat(special_features, 0)
+    if (Is_gallery):
+        result_f = {'gallery_f':features.numpy(),'gallery_label':labels}
+        scipy.io.savemat(os.path.join(args.gallery_feature_dir, 'pytorch_result_gallery_{:d}.mat'.format(part)),result_f)
+        result_sf = {'gallery_f':special_features.numpy(),'gallery_label':labels}
+        scipy.io.savemat(os.path.join(args.gallery_feature_dir, 'pytorch_result_gallery_multi_{:d}.mat'.format(part)),result_sf)
+    else:
+        result_f = {'query_f':features.numpy(),'query_label':labels}
+        scipy.io.savemat(os.path.join(args.probe_feature_dir, 'pytorch_result_query_{:d}.mat'.format(part)),result_f)
+        result_sf = {'gallery_f':special_features.numpy(),'gallery_label':labels}
+        scipy.io.savemat(os.path.join(args.probe_feature_dir, 'pytorch_result_query_multi_{:d}.mat'.format(part)),result_sf)
         # features = torch.cat((features, f), 0)
         # special_features = torch.cat((special_features, sf), 0)
-    return features, special_features
+    return count
 
 gallery_feature = extract_feature(model,dataloaders['gallery'],labelsloader['gallery'])
 query_feature = extract_feature(model,dataloaders['query'],labelsloader['query'],Is_gallery=False)
