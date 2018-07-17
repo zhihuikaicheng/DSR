@@ -133,7 +133,7 @@ def extract_feature(model,dataloaders,labelsloader,Is_gallery=True):
             special_features.append(sf[i])
             lab = next(labelsloader)
             label = get_id(lab)
-            labels.append(label[i])
+            labels.append(label)
             
         if (count % 20 == 0):
             part = int (count / 20)
