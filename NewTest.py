@@ -175,12 +175,12 @@ def extract_feature(model,dataloaders,labelsloader,Is_gallery=True):
         # special_features = torch.cat((special_features, sf), 0)
     return count
 
-if not os.path.exist(args.gallery_feature_dir):
+if not os.path.exists(args.gallery_feature_dir):
     os.makedirs(args.gallery_feature_dir)
 
-if not os.path.exist(args.query_feature_dir):
+if not os.path.exists(args.query_feature_dir):
     os.makedirs(args.query_feature_dir)
-    
+
 gallery_feature = extract_feature(model,dataloaders['gallery'],labelsloader['gallery'])
 query_feature = extract_feature(model,dataloaders['query'],labelsloader['query'],Is_gallery=False)
 # pdb.set_trace()
