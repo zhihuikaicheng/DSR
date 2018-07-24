@@ -10,14 +10,13 @@ from torch.optim import lr_scheduler
 from torch.autograd import Variable
 import numpy as np
 import torchvision
-from torchvision import models, transforms
+from torchvision import transforms
 import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 from PIL import Image
 import time
 import os
-from model import ft_net, ft_net_dense, PCB
 import json
 from utils.Dataset import Dataset
 from utils.sampler import RandomIdentitySampler
