@@ -37,7 +37,7 @@ def make_dataset(dir, class_to_idx, extensions, CAM=False):
                 if has_file_allowed_extension(fname, extensions):
                     path = os.path.join(root, fname)
                     if CAM :
-                        cam = fname.split('c', 1)[0]
+                        cam = fname.split('c', 1)[1][0]
                         item = (path, class_to_idx[target], int(target), int(cam))
                     else:
                         item = (path, class_to_idx[target], int(target))
