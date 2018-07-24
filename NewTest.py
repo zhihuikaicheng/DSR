@@ -190,6 +190,6 @@ if not os.path.exists(args.gallery_feature_dir):
 if not os.path.exists(args.query_feature_dir):
     os.makedirs(args.query_feature_dir)
 
-gallery_feature = extract_feature(model,dataloaders['gallery'])
-query_feature = extract_feature(model,dataloaders['query'],Is_gallery=False)
+gallery_feature = extract_feature(model,dataloaders['gallery'], useCAM=args.useCAM)
+query_feature = extract_feature(model,dataloaders['query'], Is_gallery=False, useCAM=args.useCAM)
 
