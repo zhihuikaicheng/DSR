@@ -171,6 +171,8 @@ def extract_feature(model, dataloaders, Is_gallery=True, useCAM=False):
             features = []
             special_features = []
             labels = []
+            if useCAM:
+                cams = []
 
     part = int (count / 100 ) + 1
     features = torch.cat(features, 0)
