@@ -88,7 +88,7 @@ model = load_network(model)
 #             labels.append(int(label))
 #     return labels
 
-def save_feature(features, special_features, labels, cams=None, Is_gallery=True):
+def save_feature(part, features, special_features, labels, cams=None, Is_gallery=True):
     if Is_gallery:
         part_feat = 'gallery_feat'
         part_label = 'gallery_label'
@@ -164,9 +164,9 @@ def extract_feature(model, dataloaders, Is_gallery=True, useCAM=False):
             labels = torch.cat(labels, 0)
             if useCAM:
                 cams = torch.cat(cams, 0)
-                save_feature(features, special_features, labels, cams, Is_gallery=Is_gallery)
+                save_feature(part, features, special_features, labels, cams, Is_gallery=Is_gallery)
             else:
-                save_feature(features, special_features, labels, Is_gallery=Is_gallery)
+                save_feature(part, features, special_features, labels, Is_gallery=Is_gallery)
 
             features = []
             special_features = []
@@ -177,9 +177,9 @@ def extract_feature(model, dataloaders, Is_gallery=True, useCAM=False):
     special_features = torch.cat(special_features, 0)
     if useCAM:
         cams = torch.cat(cams, 0)
-        save_feature(features, special_features, labels, cams, Is_gallery=Is_gallery)
+        save_feature(part, features, special_features, labels, cams, Is_gallery=Is_gallery)
     else:
-        save_feature(features, special_features, labels, Is_gallery=Is_gallery)
+        save_feature(part, features, special_features, labels, Is_gallery=Is_gallery)
 
     print(count)
     return count
