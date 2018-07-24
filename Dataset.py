@@ -24,7 +24,7 @@ def find_classes(dir):
     class_to_idx = {classes[i]: i for i in range(len(classes))}
     return classes, class_to_idx
 
-def make_dataset(dir, class_to_idx, extensions):
+def make_dataset(dir, class_to_idx, extensions, CAM=False):
     images = []
     dir = os.path.expanduser(dir)
     for target in sorted(os.listdir(dir)):
@@ -36,7 +36,11 @@ def make_dataset(dir, class_to_idx, extensions):
             for fname in sorted(fnames):
                 if has_file_allowed_extension(fname, extensions):
                     path = os.path.join(root, fname)
-                    item = (path, class_to_idx[target], target)
+                    if CAM :
+                        cam = fname.split('c', 1)[0]
+                        item = (path, class_to_idx[target], int(target), int(cam))
+                    else:
+                        item = (path, class_to_idx[target], int(target))
                     images.append(item)
 
     return images
@@ -67,17 +71,24 @@ def default_loader(path):
         return pil_loader(path)
 
 class Dataset(data.Dataset):
-    def __init__(self, image_dir, transform=None):
+    def __init__(self, image_dir, transform=None, CAM=False):
         self.transform = transform
         classes, class_to_idx = find_classes(image_dir)
-        self.data = make_dataset(image_dir, class_to_idx, IMG_EXTENSIONS)
+        self.data = make_dataset(image_dir, class_to_idx, IMG_EXTENSIONS, CAM)
+        self.CAM = CAM
 
     def __getitem__(self, index):
-        path, pid, real_id = self.data[index]
+        if self.CAM:
+            path, pid, real_id, cam = self.data[index]
+        else:
+            path, pid, real_id = self.data[index]
         img = default_loader(path)
         if self.transform is not None:
             img = self.transform(img)
-        return img, pid, real_id
+        if self.CAM:
+            return img, pid, real_id, cam
+        else:
+            return img, pid, real_id
 
     def __len__(self):
         return len(self.data)
