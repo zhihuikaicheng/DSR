@@ -1,17 +1,18 @@
 from __future__ import print_function
 
 import argparse
-import scipy.io
+import scipy.io as sio
 import numpy as np
 import time
 from util.evaluation import cmc, mean_ap, dsr_dist
+import pdb
 
 #args
 ##############################################
 parser = argparse.ArgumentParser()
 parser.add_argument('--gallery_path', type=str)
 parser.add_argument('--query_path', type=str)
-
+parser.add_argument('--use_multi_scale', type=bool, default=False)
 
 args = parser.parse_args()
 
@@ -19,7 +20,12 @@ args = parser.parse_args()
 # Evaluate
 
 def loadmat(file_dir):
-    
+    for filename in os.listdir(file_dir):
+        if ('multi' in filename) and (args.use_multi_scale):
+            mat = sio.loadmat(os.path.join(file_dir, filename))
+        elif not (('multi' in filename) or (args.use_multi_scale)):
+            mat = sio.loadmat(os.path.join(file_dir, filename))
+        pdb.set_trace()
     return feats, labels, cams
 
 gallery_feature, gallery_label, gallery_cam = loadmat(args.gallery_dir)
