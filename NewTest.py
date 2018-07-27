@@ -88,14 +88,9 @@ model = load_network(model)
 #     return labels
 
 def save_feature(part, features, special_features, labels, cams=None, Is_gallery=True):
-    if Is_gallery:
-        part_feat = 'gallery_feat'
-        part_label = 'gallery_label'
-        part_cam = 'gallery_cam'
-    else:
-        part_feat = 'query_feat'
-        part_label = 'query_label'
-        part_cam = 'query_cam'
+    part_feat = 'feat'
+    part_label = 'label'
+    part_cam = 'cam'
 
     if cams is not None:
         result_f = {part_feat: features.numpy(), part_label: labels, part_cam: cams}
