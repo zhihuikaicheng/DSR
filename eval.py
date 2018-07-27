@@ -4,14 +4,14 @@ import argparse
 import scipy.io as sio
 import numpy as np
 import time
-from util.evaluation import cmc, mean_ap, dsr_dist
+from utils.evaluation import cmc, mean_ap
 import pdb
 
 #args
 ##############################################
 parser = argparse.ArgumentParser()
-parser.add_argument('--gallery_path', type=str)
-parser.add_argument('--query_path', type=str)
+parser.add_argument('--gallery_dir', type=str)
+parser.add_argument('--query_dir', type=str)
 parser.add_argument('--use_multi_scale', type=bool, default=False)
 
 args = parser.parse_args()
@@ -31,7 +31,7 @@ def loadmat(file_dir):
 gallery_feature, gallery_label, gallery_cam = loadmat(args.gallery_dir)
 query_feature, query_label, query_cam = loadmat(args.query_dir)
 
-distmat = dsr_dist(query_feature, gallery_feature)
+# distmat = dsr_dist(query_feature, gallery_feature)
 
 res_rank = cmc(distmat, query_label, gallery_label, query_cam, gallery_cam, first_match_break=True)
 res_map = mean_ap(distmat, query_label, gallery_label, query_cam, gallery_cam)
