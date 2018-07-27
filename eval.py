@@ -1,4 +1,4 @@
-from __future__ import print_function
+from __future__ import print_function, division
 
 import argparse
 import scipy.io as sio
@@ -13,7 +13,7 @@ import pdb
 parser = argparse.ArgumentParser()
 parser.add_argument('--gallery_dir', type=str)
 parser.add_argument('--query_dir', type=str)
-parser.add_argument('--use_multi_scale', type=bool, default=False)
+parser.add_argument('--use_multi_scale', action='store_true')
 
 args = parser.parse_args()
 
