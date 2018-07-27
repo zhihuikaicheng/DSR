@@ -4,6 +4,7 @@ import argparse
 import scipy.io as sio
 import numpy as np
 import time
+import os
 from utils.evaluation import cmc, mean_ap
 import pdb
 
