@@ -22,9 +22,9 @@ args = parser.parse_args()
 
 def loadmat(file_dir):
     for filename in os.listdir(file_dir):
-        if ('multi' in filename) and (args.use_multi_scale):
+        if ('multi' in filename) and (args.use_multi_scale==True):
             mat = sio.loadmat(os.path.join(file_dir, filename))
-        elif not (('multi' in filename) or (args.use_multi_scale)):
+        elif not (('multi' in filename) or (args.use_multi_scale==True)):
             mat = sio.loadmat(os.path.join(file_dir, filename))
         pdb.set_trace()
     return feats, labels, cams
