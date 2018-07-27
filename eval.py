@@ -20,17 +20,17 @@ args = parser.parse_args()
 #######################################################################
 # Evaluate
 
-def loadmat(file_dir):
+def loadmat(file_dir, is_multi_scale=False):
     for filename in os.listdir(file_dir):
-        if ('multi' in filename) and (args.use_multi_scale==True):
+        if ('multi' in filename) and (is_multi_scale):
             mat = sio.loadmat(os.path.join(file_dir, filename))
-        elif not (('multi' in filename) or (args.use_multi_scale==True)):
+        elif not (('multi' in filename) or (is_multi_scale)):
             mat = sio.loadmat(os.path.join(file_dir, filename))
         pdb.set_trace()
     return feats, labels, cams
 
-gallery_feature, gallery_label, gallery_cam = loadmat(args.gallery_dir)
-query_feature, query_label, query_cam = loadmat(args.query_dir)
+gallery_feature, gallery_label, gallery_cam = loadmat(args.gallery_dir, args.use_multi_scale)
+query_feature, query_label, query_cam = loadmat(args.query_dir, args.use_multi_scale)
 
 # distmat = dsr_dist(query_feature, gallery_feature)
 
