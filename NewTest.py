@@ -152,7 +152,7 @@ def extract_feature(model, dataloaders, Is_gallery=True, useCAM=False):
         if useCAM:
             cams.append(cam)
 
-        if (count % 100 == 0):
+        if (count % 10 == 0):
             print(count * args.batch_size)
             part = int (count / 100)
             features = torch.cat(features, 0)
