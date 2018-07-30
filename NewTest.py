@@ -99,6 +99,8 @@ def save_feature(part, features, special_features, labels, cams=None, Is_gallery
         result_f = {part_feat: features.numpy(), part_label: labels}
         result_sf = {part_feat: special_features.numpy(), part_label: labels}
 
+    pdb.set_trace()
+
     if Is_gallery:
         scipy.io.savemat(os.path.join(args.gallery_feature_dir, 'pytorch_result_gallery_{:d}.mat'.format(part)), result_f)
         scipy.io.savemat(os.path.join(args.gallery_feature_dir, 'pytorch_result_gallery_multi_{:d}.mat'.format(part)), result_sf)
