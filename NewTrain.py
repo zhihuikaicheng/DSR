@@ -216,5 +216,7 @@ def train_model(model, optimizer, scheduler, num_epochs):
         if (epoch + 1) % 10 == 0:
             save_network(model, epoch)
 
+    save_network(model, 'last')
+
 model = train_model(model, optimizer_ft, exp_lr_scheduler,
                        args.num_epochs)
