@@ -203,5 +203,5 @@ def global_loss(tri_loss, global_feat, global_feat1, labels, normalize_feature=T
   loss1 = tri_loss(dist_p, dist_n)
   #print(len(p_inds))
   loss2 = tri_loss(dist_ap, dist_an)
-  loss=loss1+loss2
+  loss = 0.7 * loss1 + 0.3 * loss2
   return loss, p_inds, n_inds, dist_ap, dist_an, dist_mat
