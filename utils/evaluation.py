@@ -118,3 +118,64 @@ def mean_ap(distmat, query_ids=None, gallery_ids=None,
     if len(aps) == 0:
         raise RuntimeError("No valid query")
     return np.mean(aps)
+
+def compute_dist2(array1, array2, type='euclidean'):
+  """Compute the euclidean or cosine distance of all pairs.
+  Args:
+    array1: numpy array with shape [m1, n]
+    array2: numpy array with shape [m2, n]
+    type: one of ['cosine', 'euclidean']
+  Returns:
+    numpy array with shape [m1, m2]
+  """
+  #array1 = normalize(array1, axis=1)
+  #array2 = normalize(array2, axis=1)
+  assert type in ['cosine', 'euclidean']
+  if type == 'cosine':
+    array1 = normalize(array1, axis=1)
+    array2 = normalize(array2, axis=1)
+    dist = np.matmul(array1, array2.T)
+    return dist
+  else:
+    # shape [m1, 1]
+    square1 = np.sum(np.square(array1), axis=1)[..., np.newaxis]
+    # shape [1, m2]
+    square2 = np.sum(np.square(array2), axis=1)[np.newaxis, ...]
+    squared_dist = - 2 * np.matmul(array1, array2.T) + square1 + square2
+    squared_dist[squared_dist < 0] = 0
+    dist = np.sqrt(squared_dist)
+    return dist
+
+def dsr_dist(array1, array2, type='euclidean'):
+
+  #array1 = normalize1(array1, axis=1)
+  #array2 = normalize1(array2, axis=1)
+  assert type in ['cosine', 'euclidean']
+  if type == 'cosine':
+    array1 = normalize(array1, axis=1)
+    array2 = normalize(array2, axis=1)
+    dist = np.matmul(array1, array2.T)
+    return dist
+  else:
+    x = torch.FloatTensor(array1)
+    x = x.cuda()
+    m = x.size(0)
+    n = array2.shape[0]
+    kappa = 0.001
+    dist = torch.zeros(m, n)
+    dist = dist.cuda()
+    T = kappa * torch.eye(71)
+    T = T.cuda()
+    for i in range(0, n):
+      if (i%100==0):
+        print('testing',i)
+      y = torch.FloatTensor(array2[i,::])
+      y = y.cuda()
+      Proj_M = torch.matmul(torch.inverse(torch.matmul(y.t(), y) + T), y.t())
+      for j in range(0, 3368):
+        temp = x[j, ::]
+        a = torch.matmul(y, torch.matmul(Proj_M, temp)) - temp
+        dist[j, i] = torch.pow(a, 2).sum(0).sqrt().mean()
+    dist = dist.cpu()
+    dist = dist.numpy()
+    return dist
