@@ -1,5 +1,5 @@
 python NewTest.py \
---sys_device_ids='(2,3,4,5)' \
+--sys_device_ids='(0,)' \
 --test_dir='/world/data-gpu-94/sysu-reid/person-reid-data/Market-1501/Market-1501-v15.09.15/pytorch' \
 --model_save_dir='/world/data-gpu-94/sysu-reid/checkpoints/DSR_Market' \
 --batch_size=64 \
@@ -8,4 +8,4 @@ python NewTest.py \
 --which_epoch='59' \
 --gallery_feature_dir='/world/data-gpu-94/sysu-reid/features_save/DSR_Market/gallery' \
 --query_feature_dir='/world/data-gpu-94/sysu-reid/features_save/DSR_Market/query' \
---useCAM=1
+--useCAM

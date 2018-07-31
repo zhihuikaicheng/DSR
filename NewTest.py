@@ -42,7 +42,7 @@ parser.add_argument('--img_w', type=int, default=256)
 parser.add_argument('--which_epoch',default='last', type=str, help='0,1,2,3...or last')
 parser.add_argument('--gallery_feature_dir', type=str)
 parser.add_argument('--query_feature_dir', type=str)
-parser.add_argument('--useCAM', type=bool, default=False)
+parser.add_argument('--useCAM', action='store_true')
 
 args = parser.parse_args()
 
@@ -93,13 +93,11 @@ def save_feature(part, features, special_features, labels, cams=None, Is_gallery
     part_cam = 'cam'
 
     if cams is not None:
-        result_f = {part_feat: features.numpy(), part_label: labels, part_cam: cams}
-        result_sf = {part_feat: special_features.numpy(), part_label: labels, part_cam: cams}
+        result_f = {part_feat: features, part_label: labels, part_cam: cams}
+        result_sf = {part_feat: special_features, part_label: labels, part_cam: cams}
     else:
-        result_f = {part_feat: features.numpy(), part_label: labels}
-        result_sf = {part_feat: special_features.numpy(), part_label: labels}
-
-    pdb.set_trace()
+        result_f = {part_feat: features, part_label: labels}
+        result_sf = {part_feat: special_features, part_label: labels}
 
     if Is_gallery:
         scipy.io.savemat(os.path.join(args.gallery_feature_dir, 'pytorch_result_gallery_{:d}.mat'.format(part)), result_f)
@@ -152,14 +150,14 @@ def extract_feature(model, dataloaders, Is_gallery=True, useCAM=False):
         if useCAM:
             cams.append(cam)
 
-        if (count % 10 == 0):
+        if (count % 100 == 0):
             print(count * args.batch_size)
             part = int (count / 100)
-            features = torch.cat(features, 0)
-            special_features = torch.cat(special_features, 0)
-            labels = torch.cat(labels, 0)
+            features = torch.cat(features, 0).numpy()
+            special_features = torch.cat(special_features, 0).numpy()
+            labels = torch.cat(labels, 0).numpy()
             if useCAM:
-                cams = torch.cat(cams, 0)
+                cams = torch.cat(cams, 0).numpy()
                 save_feature(part, features, special_features, labels, cams, Is_gallery=Is_gallery)
             else:
                 save_feature(part, features, special_features, labels, Is_gallery=Is_gallery)
@@ -171,11 +169,11 @@ def extract_feature(model, dataloaders, Is_gallery=True, useCAM=False):
                 cams = []
 
     part = int (count / 100 ) + 1
-    features = torch.cat(features, 0)
-    special_features = torch.cat(special_features, 0)
-    labels = torch.cat(labels, 0)
+    features = torch.cat(features, 0).numpy()
+    special_features = torch.cat(special_features, 0).numpy()
+    labels = torch.cat(labels, 0).numpy()
     if useCAM:
-        cams = torch.cat(cams, 0)
+        cams = torch.cat(cams, 0).numpy()
         save_feature(part, features, special_features, labels, cams, Is_gallery=Is_gallery)
     else:
         save_feature(part, features, special_features, labels, Is_gallery=Is_gallery)
