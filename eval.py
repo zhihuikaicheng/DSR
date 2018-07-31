@@ -22,14 +22,21 @@ args = parser.parse_args()
 # Evaluate
 
 def loadmat(file_dir, is_multi_scale=False):
+    feats = []
+    labels = []
+    cams = []
     for filename in os.listdir(file_dir):
         if ('multi' in filename) and (is_multi_scale):
             mat = sio.loadmat(os.path.join(file_dir, filename))
         elif not (('multi' in filename) or (is_multi_scale)):
             mat = sio.loadmat(os.path.join(file_dir, filename))
-        feats = mat['feat']
-        labels = mat['labels']
-        cams = mat['cams']
+        feats.append(mat['feat'])
+        labels.append(mat['label'])
+        cams.append(mat['cam'])
+
+    feats = np.concatenate(feats, axis=0)
+    labels = np.concatenate(labels, axis=0)
+    cams = np.concatenate(cams, axis=0)
     return feats, labels, cams
 
 gallery_feature, gallery_label, gallery_cam = loadmat(args.gallery_dir, args.use_multi_scale)
