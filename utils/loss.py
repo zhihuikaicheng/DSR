@@ -146,7 +146,7 @@ def DSR_L(x, y, p_inds, n_inds):
   dist_n = Variable(torch.zeros(m, 1))
   dist_p = dist_p.cuda()
   dist_n = dist_n.cuda()
-  T = kappa * Variable(torch.eye(11))
+  T = kappa * Variable(torch.eye(65))
   T = T.cuda()
   T.detach()
 
