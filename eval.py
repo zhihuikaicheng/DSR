@@ -29,14 +29,13 @@ def loadmat(file_dir, is_multi_scale=False):
         if ('multi' in filename) and (is_multi_scale):
             mat = sio.loadmat(os.path.join(file_dir, filename))
             feats.append(mat['feat'])
-            labels.append(mat['label'])
-            cams.append(mat['cam'])
+            labels.append(mat['label'].squeeze(0))
+            cams.append(mat['cam'].squeeze(0))
         elif not (('multi' in filename) or (is_multi_scale)):
             mat = sio.loadmat(os.path.join(file_dir, filename))
             feats.append(mat['feat'])
-            labels.append(mat['label'])
-            cams.append(mat['cam'])
-        
+            labels.append(mat['label'].squeeze(0))
+            cams.append(mat['cam'].sqeeuze(0))    
     feats = np.concatenate(feats, axis=0)
     labels = np.concatenate(labels, axis=0)
     cams = np.concatenate(cams, axis=0)
