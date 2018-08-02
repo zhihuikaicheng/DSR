@@ -70,9 +70,9 @@ for ad in range(0, 11):
     q_g_dist = (1-lam) * q_g_dist1 + lam * q_g_dist2
     res_rank = cmc(q_g_dist, query_label, gallery_label, query_cam, gallery_cam, first_match_break=True)
     res_map = mean_ap(q_g_dist, query_label, gallery_label, query_cam, gallery_cam)
-    print('ad:{:d}, {:<30}\'.format(ad, 'Single Query:'))
+    print('''ad:{:d}'''.format(ad))
     print(res_rank)
-    print('\')
+    print('''''')
     print(res_map)
 
 
