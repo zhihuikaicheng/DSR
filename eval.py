@@ -35,7 +35,7 @@ def loadmat(file_dir, is_multi_scale=False):
             mat = sio.loadmat(os.path.join(file_dir, filename))
             feats.append(mat['feat'])
             labels.append(mat['label'].squeeze(0))
-            cams.append(mat['cam'].sqeeuze(0))    
+            cams.append(mat['cam'].squeeze(0))    
     feats = np.concatenate(feats, axis=0)
     labels = np.concatenate(labels, axis=0)
     cams = np.concatenate(cams, axis=0)
@@ -46,11 +46,11 @@ def loadsinglemat(file_dir):
     labels = []
     cams = []
     for filename in os.listdir(file_dir):
-        if 'multi' not in filename
+        if 'multi' not in filename:
             mat = sio.loadmat(os.path.join(file_dir, filename))
             feats.append(mat['feat'])
             labels.append(mat['label'].squeeze(0))
-            cams.append(mat['cam'].sqeeuze(0))    
+            cams.append(mat['cam'].squeeze(0))    
     feats = np.concatenate(feats, axis=0)
     labels = np.concatenate(labels, axis=0)
     cams = np.concatenate(cams, axis=0)
@@ -62,14 +62,14 @@ query_single_feature, _, _ = loadsinglemat(args.query_dir)
 gallery_feature, gallery_label, gallery_cam = loadmat(args.gallery_dir, args.use_multi_scale)
 query_feature, query_label, query_cam = loadmat(args.query_dir, args.use_multi_scale)
 
-q_g_dist1 = compute_dist2(gallery_single_feature, query_single_feature, type='euclidean')
+q_g_dist1 = compute_dist2(query_single_feature, gallery_single_feature, type='euclidean')
 q_g_dist2 = dsr_dist(query_feature, gallery_feature, type='euclidean')
 
 for ad in range(0, 11):
     lam = ad*0.1
     q_g_dist = (1-lam) * q_g_dist1 + lam * q_g_dist2
-    res_rank = cmc(distmat, query_label, gallery_label, query_cam, gallery_cam, first_match_break=True)
-    res_map = mean_ap(distmat, query_label, gallery_label, query_cam, gallery_cam)
+    res_rank = cmc(q_g_dist, query_label, gallery_label, query_cam, gallery_cam, first_match_break=True)
+    res_map = mean_ap(q_g_dist, query_label, gallery_label, query_cam, gallery_cam)
     print('ad:{:d}, {:<30}'.format(ad, 'Single Query:'), end='')
     print(res_rank)
     print(res_map)

@@ -2,6 +2,8 @@ from __future__ import absolute_import
 from collections import defaultdict
 
 import numpy as np
+import torch
+import pdb
 from sklearn.metrics import average_precision_score
 
 def to_numpy(tensor):
@@ -164,13 +166,14 @@ def dsr_dist(array1, array2, type='euclidean'):
     kappa = 0.001
     dist = torch.zeros(m, n)
     dist = dist.cuda()
-    T = kappa * torch.eye(71)
+    T = kappa * torch.eye(65)
     T = T.cuda()
     for i in range(0, n):
       if (i%100==0):
         print('testing',i)
       y = torch.FloatTensor(array2[i,::])
       y = y.cuda()
+      #pdb.set_trace()
       Proj_M = torch.matmul(torch.inverse(torch.matmul(y.t(), y) + T), y.t())
       for j in range(0, 3368):
         temp = x[j, ::]
