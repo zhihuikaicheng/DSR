@@ -164,8 +164,6 @@ def dsr_dist(array1, array2, type='euclidean'):
         y = torch.FloatTensor(array2)
         m = x.size(0)
         n = y.size(0)
-        x = x.cuda()
-        y = y.cuda()
         kappa = 0.001
         dist = torch.zeros(m, n)
         dist = dist.cuda()
@@ -176,10 +174,12 @@ def dsr_dist(array1, array2, type='euclidean'):
                 print('testing',i)
 
             y1 = y[i,::]
+            y1 = y1.cuda()
             #pdb.set_trace()
             Proj_M = torch.matmul(torch.inverse(torch.matmul(y1.t(), y1) + T), y1.t())
             for j in range(0, m):
                 x1 = x[j, ::]
+                x1 = x1.cuda()
                 a = torch.matmul(y1, torch.matmul(Proj_M, x1)) - x1
                 dist[j, i] = torch.pow(a, 2).sum(0).sqrt()
                 pdb.set_trace()
