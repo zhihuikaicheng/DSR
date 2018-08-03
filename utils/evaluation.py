@@ -139,7 +139,7 @@ def compute_dist2(array1, array2, type='euclidean'):
         array1 = normalize(array1, axis=1)
         array2 = normalize(array2, axis=1)
         dist = np.matmul(array1, array2.T)
-    return dist
+        return dist
     else:
         # shape [m1, 1]
         square1 = np.sum(np.square(array1), axis=1)[..., np.newaxis]
@@ -183,7 +183,7 @@ def dsr_dist(array1, array2, type='euclidean'):
                 a = torch.matmul(y1, torch.matmul(Proj_M, x1)) - x1
                 dist[j, i] = torch.pow(a, 2).sum(0).sqrt()
                 pdb.set_trace()
-                
+
         dist = dist.cpu()
         dist = dist.numpy()
     return dist
