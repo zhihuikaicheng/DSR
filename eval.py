@@ -14,28 +14,23 @@ import pdb
 parser = argparse.ArgumentParser()
 parser.add_argument('--gallery_dir', type=str)
 parser.add_argument('--query_dir', type=str)
-parser.add_argument('--use_multi_scale', action='store_true')
 
 args = parser.parse_args()
 
 #######################################################################
 # Evaluate
 
-def loadmat(file_dir, is_multi_scale=False):
+def loadmat(file_dir):
     feats = []
     labels = []
     cams = []
     for filename in os.listdir(file_dir):
-        if ('multi' in filename) and (is_multi_scale):
+        if 'multi' in filename:
             mat = sio.loadmat(os.path.join(file_dir, filename))
             feats.append(mat['feat'])
             labels.append(mat['label'].squeeze(0))
             cams.append(mat['cam'].squeeze(0))
-        elif not (('multi' in filename) or (is_multi_scale)):
-            mat = sio.loadmat(os.path.join(file_dir, filename))
-            feats.append(mat['feat'])
-            labels.append(mat['label'].squeeze(0))
-            cams.append(mat['cam'].squeeze(0))    
+
     feats = np.concatenate(feats, axis=0)
     labels = np.concatenate(labels, axis=0)
     cams = np.concatenate(cams, axis=0)
@@ -50,7 +45,8 @@ def loadsinglemat(file_dir):
             mat = sio.loadmat(os.path.join(file_dir, filename))
             feats.append(mat['feat'])
             labels.append(mat['label'].squeeze(0))
-            cams.append(mat['cam'].squeeze(0))    
+            cams.append(mat['cam'].squeeze(0))
+
     feats = np.concatenate(feats, axis=0)
     labels = np.concatenate(labels, axis=0)
     cams = np.concatenate(cams, axis=0)
@@ -59,8 +55,8 @@ def loadsinglemat(file_dir):
 gallery_single_feature, _, _ = loadsinglemat(args.gallery_dir)
 query_single_feature, _, _ = loadsinglemat(args.query_dir)
 
-gallery_feature, gallery_label, gallery_cam = loadmat(args.gallery_dir, args.use_multi_scale)
-query_feature, query_label, query_cam = loadmat(args.query_dir, args.use_multi_scale)
+gallery_feature, gallery_label, gallery_cam = loadmat(args.gallery_dir)
+query_feature, query_label, query_cam = loadmat(args.query_dir)
 
 q_g_dist1 = compute_dist2(query_single_feature, gallery_single_feature, type='euclidean')
 q_g_dist2 = dsr_dist(query_feature, gallery_feature, type='euclidean')

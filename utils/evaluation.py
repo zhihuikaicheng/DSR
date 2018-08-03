@@ -132,53 +132,55 @@ def compute_dist2(array1, array2, type='euclidean'):
   """
   #array1 = normalize(array1, axis=1)
   #array2 = normalize(array2, axis=1)
-  assert type in ['cosine', 'euclidean']
-  if type == 'cosine':
-    array1 = normalize(array1, axis=1)
-    array2 = normalize(array2, axis=1)
-    dist = np.matmul(array1, array2.T)
+    assert type in ['cosine', 'euclidean']
+    if type == 'cosine':
+        array1 = normalize(array1, axis=1)
+        array2 = normalize(array2, axis=1)
+        dist = np.matmul(array1, array2.T)
     return dist
-  else:
-    # shape [m1, 1]
-    square1 = np.sum(np.square(array1), axis=1)[..., np.newaxis]
-    # shape [1, m2]
-    square2 = np.sum(np.square(array2), axis=1)[np.newaxis, ...]
-    squared_dist = - 2 * np.matmul(array1, array2.T) + square1 + square2
-    squared_dist[squared_dist < 0] = 0
-    dist = np.sqrt(squared_dist)
+    else:
+        # shape [m1, 1]
+        square1 = np.sum(np.square(array1), axis=1)[..., np.newaxis]
+        # shape [1, m2]
+        square2 = np.sum(np.square(array2), axis=1)[np.newaxis, ...]
+        squared_dist = - 2 * np.matmul(array1, array2.T) + square1 + square2
+        squared_dist[squared_dist < 0] = 0
+        dist = np.sqrt(squared_dist)
     return dist
 
 def dsr_dist(array1, array2, type='euclidean'):
 
-  #array1 = normalize1(array1, axis=1)
-  #array2 = normalize1(array2, axis=1)
-  assert type in ['cosine', 'euclidean']
-  if type == 'cosine':
-    array1 = normalize(array1, axis=1)
-    array2 = normalize(array2, axis=1)
-    dist = np.matmul(array1, array2.T)
-    return dist
-  else:
-    x = torch.FloatTensor(array1)
-    x = x.cuda()
-    m = x.size(0)
-    n = array2.shape[0]
-    kappa = 0.001
-    dist = torch.zeros(m, n)
-    dist = dist.cuda()
-    T = kappa * torch.eye(65)
-    T = T.cuda()
-    for i in range(0, n):
-      if (i%100==0):
-        print('testing',i)
-      y = torch.FloatTensor(array2[i,::])
-      y = y.cuda()
-      #pdb.set_trace()
-      Proj_M = torch.matmul(torch.inverse(torch.matmul(y.t(), y) + T), y.t())
-      for j in range(0, 3368):
-        temp = x[j, ::]
-        a = torch.matmul(y, torch.matmul(Proj_M, temp)) - temp
-        dist[j, i] = torch.pow(a, 2).sum(0).sqrt().mean()
-    dist = dist.cpu()
-    dist = dist.numpy()
+    #array1 = normalize1(array1, axis=1) 
+    #array2 = normalize1(array2, axis=1)
+    assert type in ['cosine', 'euclidean']
+    if type == 'cosine':
+        array1 = normalize(array1, axis=1)
+        array2 = normalize(array2, axis=1)
+        dist = np.matmul(array1, array2.T)
+        return dist
+    else:
+        x = torch.FloatTensor(array1)
+        y = torch.FloatTensor(array2)
+        m = x.size(0)
+        n = y.size(0)
+        x = x.cuda()
+        y = y.cuda()
+        kappa = 0.001
+        dist = torch.zeros(m, n)
+        dist = dist.cuda()
+        T = kappa * torch.eye(65)
+        T = T.cuda()
+        for i in range(0, n):
+            if (i%100==0):
+                print('testing',i)
+
+            y1 = y[i,::]
+            #pdb.set_trace()
+            Proj_M = torch.matmul(torch.inverse(torch.matmul(y1.t(), y1) + T), y1.t())
+            for j in range(0, m):
+                x1 = x[j, ::]
+                a = torch.matmul(y1, torch.matmul(Proj_M, x1)) - x1
+                dist[j, i] = torch.pow(a, 2).sum(0).sqrt()
+        dist = dist.cpu()
+        dist = dist.numpy()
     return dist
