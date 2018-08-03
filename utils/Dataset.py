@@ -28,6 +28,8 @@ def make_dataset(dir, class_to_idx, extensions, CAM=False):
     images = []
     dir = os.path.expanduser(dir)
     for target in sorted(os.listdir(dir)):
+        if target == '-1' or target == '0':
+            continue
         d = os.path.join(dir, target)
         if not os.path.isdir(d):
             continue
