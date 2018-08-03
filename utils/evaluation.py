@@ -122,16 +122,18 @@ def mean_ap(distmat, query_ids=None, gallery_ids=None,
     return np.mean(aps)
 
 def compute_dist2(array1, array2, type='euclidean'):
-  """Compute the euclidean or cosine distance of all pairs.
-  Args:
-    array1: numpy array with shape [m1, n]
-    array2: numpy array with shape [m2, n]
-    type: one of ['cosine', 'euclidean']
-  Returns:
-    numpy array with shape [m1, m2]
-  """
-  #array1 = normalize(array1, axis=1)
-  #array2 = normalize(array2, axis=1)
+    """
+    Compute the euclidean or cosine distance of all pairs.
+    Args:
+        array1: numpy array with shape [m1, n]
+        array2: numpy array with shape [m2, n]
+        type: one of ['cosine', 'euclidean']
+    Returns:
+        numpy array with shape [m1, m2]
+    """
+
+    #array1 = normalize(array1, axis=1)
+    #array2 = normalize(array2, axis=1)
     assert type in ['cosine', 'euclidean']
     if type == 'cosine':
         array1 = normalize(array1, axis=1)
@@ -149,7 +151,6 @@ def compute_dist2(array1, array2, type='euclidean'):
     return dist
 
 def dsr_dist(array1, array2, type='euclidean'):
-
     #array1 = normalize1(array1, axis=1) 
     #array2 = normalize1(array2, axis=1)
     assert type in ['cosine', 'euclidean']
