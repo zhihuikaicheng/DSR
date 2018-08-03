@@ -182,6 +182,8 @@ def dsr_dist(array1, array2, type='euclidean'):
                 x1 = x[j, ::]
                 a = torch.matmul(y1, torch.matmul(Proj_M, x1)) - x1
                 dist[j, i] = torch.pow(a, 2).sum(0).sqrt()
+                pdb.set_trace()
+                
         dist = dist.cpu()
         dist = dist.numpy()
     return dist
