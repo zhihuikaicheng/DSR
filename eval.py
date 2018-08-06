@@ -8,7 +8,7 @@ import os
 from utils.evaluation import cmc, mean_ap
 from utils.evaluation import compute_dist2, dsr_dist
 import pdb
-
+os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2"
 #args
 ##############################################
 parser = argparse.ArgumentParser()
