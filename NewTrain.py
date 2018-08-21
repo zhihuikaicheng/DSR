@@ -144,8 +144,8 @@ def train_model(model, optimizer, scheduler, num_epochs):
 
         for data in dataloaders:
             inputs, labels = data
-            inputs = Variable(inputs.cuda())
-            labels = Variable(labels.cuda())
+            inputs = Variable(inputs.float().cuda())
+            labels = labels.long().cuda()
 
             # inputs = Variable(TVT(inputs.float()))
             # labels = TVT(labels.long())
