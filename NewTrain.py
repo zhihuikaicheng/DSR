@@ -31,7 +31,8 @@ from torch.nn.parallel import DataParallel
 #args
 ##############################################
 parser = argparse.ArgumentParser()
-parser.add_argument('--sys_device_ids', type=eval, default=(0,1,2,3))
+# parser.add_argument('--sys_device_ids', type=eval, default=(0,1,2,3))
+parser.add_argument('--sys_device_ids', type=str, default='0')
 parser.add_argument('--dataset_dir', type=str)
 parser.add_argument('--margin', type=float, default=0.3)
 parser.add_argument('--num_epochs', type=int, default=60)
@@ -80,7 +81,9 @@ y_err = []
 # model = ft_net(len(class_names))
 model = Model()
 
-TVT, TMO = set_devices(args.sys_device_ids)
+os.environ['CUDA_VISIBLE_DEVICES'] = args.sys_device_ids
+
+# TVT, TMO = set_devices(args.sys_device_ids)
 
 # criterion = nn.CrossEntropyLoss()
 margin = args.margin
@@ -100,7 +103,7 @@ optimizer_ft = optim.SGD([
 
 exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=args.lr_decay_epochs, gamma=0.1)
 
-model = DataParallel(model)
+# model = DataParallel(model)
 
 model = model.cuda()
 
@@ -119,6 +122,8 @@ def train_model(model, optimizer, scheduler, num_epochs):
     best_acc = 0.0
 
     save_network(model, 0)
+
+    st_time = time.time()
 
     for epoch in range(num_epochs):
         print ('Now {} epochs, total {} epochs'.format(epoch, num_epochs))
@@ -139,11 +144,11 @@ def train_model(model, optimizer, scheduler, num_epochs):
 
         for data in dataloaders:
             inputs, labels = data
-            # inputs = Variable(inputs.cuda())
-            # labels = Variable(labels.cuda())
+            inputs = Variable(inputs.cuda())
+            labels = Variable(labels.cuda())
 
-            inputs = Variable(TVT(inputs.float()))
-            labels = TVT(labels.long())
+            # inputs = Variable(TVT(inputs.float()))
+            # labels = TVT(labels.long())
 
             optimizer.zero_grad()
 
@@ -199,7 +204,7 @@ def train_model(model, optimizer, scheduler, num_epochs):
 
         # y_loss.append(epoch_loss)
         # y_err.append(1.0 - epoch_acc)
-        time_log = 'Ep {}, {:.2f}s'.format(epoch + 1, time.time())
+        time_log = 'Ep {}, {:.2f}s'.format(epoch + 1, time.time() - st_time)
 
         tri_log = (', prec {:.2%}, sm {:.2%}, '
                'd_ap {:.4f}, d_an {:.4f}, '
