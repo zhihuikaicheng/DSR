@@ -127,7 +127,7 @@ def extract_feature(model, dataloaders, Is_gallery=True, useCAM=False):
         
         # n, c, h, w = img.size()
         
-        input_img = Variable(img.float())
+        input_img = Variable(img.float().cuda())
         f, sf = model(input_img)
         # count += n
 
