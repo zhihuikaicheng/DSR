@@ -119,8 +119,6 @@ def train_model(model, optimizer, scheduler, num_epochs):
 
     model_weights = model.state_dict()
 
-    best_acc = 0.0
-
     save_network(model, 0)
 
     st_time = time.time()
@@ -135,6 +133,8 @@ def train_model(model, optimizer, scheduler, num_epochs):
 
         running_loss = 0.0
         running_corrects = 0
+        step = 0
+        loss = 0.0
 
         prec_meter = AverageMeter()
         sm_meter = AverageMeter()
@@ -143,6 +143,7 @@ def train_model(model, optimizer, scheduler, num_epochs):
         loss_meter = AverageMeter()
 
         for data in dataloaders:
+            step += 1
             inputs, labels = data
             inputs = Variable(inputs.float().cuda())
             labels = labels.long().cuda()
@@ -152,34 +153,38 @@ def train_model(model, optimizer, scheduler, num_epochs):
 
             optimizer.zero_grad()
 
-            outputs_x, outputs_spatialFeature = model(inputs) 
+            logits, outputs_spatialFeature = model(inputs) 
+
+            loss = nn.CrossEntropyLoss(nn.Softmax(logits), labels)
+
+            _, pred = torch.max(nn.Softmax(logits), 1)
 
             # DSR AND TRIPLET LOSS ADD IN HERE
             #################################################
-            # _, preds = torch.max(outputs.data, 1)
-            # loss = critertion(outputs, labels)
-            loss, p_inds, n_inds, dist_ap, dist_an, dist_mat = global_loss(
-                tri_loss, outputs_x, outputs_spatialFeature, labels,
-                normalize_feature=False) 
+            #loss, p_inds, n_inds, dist_ap, dist_an, dist_mat = global_loss(
+            #    tri_loss, outputs_x, outputs_spatialFeature, labels,
+            #    normalize_feature=False) 
 
             #################################################
 
             loss.backward()
             optimizer.step()
 
-            prec = (dist_an > dist_ap).data.float().mean()
-            # the proportion of triplets that satisfy margin
-            sm = (dist_an > dist_ap + margin).data.float().mean()
-            # average (anchor, positive) distance
-            d_ap = dist_ap.data.mean()
-            # average (anchor, negative) distance
-            d_an = dist_an.data.mean()
+            running_corrects += torch.sum(preds == labels)
 
-            prec_meter.update(prec)
-            sm_meter.update(sm)
-            dist_ap_meter.update(d_ap)
-            dist_an_meter.update(d_an)
-            loss_meter.update(to_scalar(loss))
+            #prec = (dist_an > dist_ap).data.float().mean()
+            # the proportion of triplets that satisfy margin
+            #sm = (dist_an > dist_ap + margin).data.float().mean()
+            # average (anchor, positive) distance
+            #d_ap = dist_ap.data.mean()
+            # average (anchor, negative) distance
+            #d_an = dist_an.data.mean()
+
+            #prec_meter.update(prec)
+            #sm_meter.update(sm)
+            #dist_ap_meter.update(d_ap)
+            #dist_an_meter.update(d_an)
+            #loss_meter.update(to_scalar(loss))
             # if step % args.steps_per_log == 0:
             #     time_log = '\tStep {}/Ep {}, {:.2f}s'.format(
             #       step, ep + 1, time.time() - step_st, )
@@ -204,17 +209,20 @@ def train_model(model, optimizer, scheduler, num_epochs):
 
         # y_loss.append(epoch_loss)
         # y_err.append(1.0 - epoch_acc)
+        acc = running_corrects / (step * batch_size)
         time_log = 'Ep {}, {:.2f}s'.format(epoch + 1, time.time() - st_time)
 
-        tri_log = (', prec {:.2%}, sm {:.2%}, '
-               'd_ap {:.4f}, d_an {:.4f}, '
-               'loss {:.4f}'.format(
-        prec_meter.avg, sm_meter.avg,
-        dist_ap_meter.avg, dist_an_meter.avg,
-        loss_meter.avg, ))
+        #tri_log = (', prec {:.2%}, sm {:.2%}, '
+        #       'd_ap {:.4f}, d_an {:.4f}, '
+        #       'loss {:.4f}'.format(
+        #prec_meter.avg, sm_meter.avg,
+        #dist_ap_meter.avg, dist_an_meter.avg,
+        #loss_meter.avg, ))
+        tri_log = ' loss: {:.2f} acc: {:.2f}'.format(loss, acc)
 
         log = time_log + tri_log
         print(log)
+
 
 
         # model.load_state_dict(model_weights)

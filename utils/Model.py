@@ -17,12 +17,14 @@ class Model(nn.Module):
     #self.conv1 = nn.Conv2d(2048, 256, 1, 1, 0)
     self.bn1 = nn.BatchNorm2d(2048)
     self.relu = nn.ReLU(inplace=True)
+    self.fc = nn.Linear(2048, 1501)
   def forward(self, x):
     # shape [N, C, H, W]
     x = self.base(x)
     x = self.bn1(x)
     x = self.relu(x)
     feature = x
+    logits = self.fc(feature)
     x1 = self.AvgPool1(x)
     x2 = self.AvgPool2(x)
     # x3 = self.AvgPool3(x)
@@ -40,4 +42,4 @@ class Model(nn.Module):
 
     spatialFeature = torch.cat((x, x1, x2), 2)
 
-    return feature, spatialFeature
+    return logits, spatialFeature
