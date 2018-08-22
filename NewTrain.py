@@ -67,11 +67,11 @@ dataloaders = torch.utils.data.DataLoader(image_datasets['train'], batch_size=ar
                                             sampler=RandomIdentitySampler(image_datasets['train'].imgs),
                                             num_workers=8)
 
-dataset_sizes = len(image_datasets['train'])
+# dataset_sizes = len(image_datasets['train'])
 
-class_names = image_datasets['train'].classes
+# class_names = image_datasets['train'].classes
 
-inputs, classes = next(iter(dataloaders))
+# inputs, classes = next(iter(dataloaders))
 
 ##############################################
 

@@ -32,7 +32,7 @@ import scipy
 #args
 ##############################################
 parser = argparse.ArgumentParser()
-parser.add_argument('--sys_device_ids', type=eval, default=(0,1,2,3))
+parser.add_argument('--sys_device_ids', type=str, default='0')
 parser.add_argument('--test_dir', type=str)
 parser.add_argument('--margin', type=float, default=0.3)
 parser.add_argument('--model_save_dir', type=str)
@@ -45,6 +45,8 @@ parser.add_argument('--query_feature_dir', type=str)
 parser.add_argument('--useCAM', action='store_true')
 
 args = parser.parse_args()
+
+os.environ['CUDA_VISIBLE_DEVICES'] = args.sys_device_ids
 
 data_transforms = transforms.Compose([
         transforms.Resize((args.img_h, args.img_w)),
@@ -64,8 +66,8 @@ def load_network(network):
     return network
 
 model = Model() #last_conv_stride=args.last_conv_stride
-TVT, TMO = set_devices(args.sys_device_ids)
-model = DataParallel(model)
+# TVT, TMO = set_devices(args.sys_device_ids)
+# model = DataParallel(model)
 model.cuda()
 model = load_network(model)
 
@@ -107,12 +109,15 @@ def save_feature(part, features, special_features, labels, cams=None, Is_gallery
         scipy.io.savemat(os.path.join(args.query_feature_dir, 'pytorch_result_query_multi_{:d}.mat'.format(part)),result_sf)
 
 def extract_feature(model, dataloaders, Is_gallery=True, useCAM=False):
+    model.eval()
+
     features = []
     special_features = []
     labels = []
     if useCAM:
         cams = []
     count = 0
+
     for data in dataloaders:
         count += 1
         if useCAM:
@@ -122,7 +127,7 @@ def extract_feature(model, dataloaders, Is_gallery=True, useCAM=False):
         
         # n, c, h, w = img.size()
         
-        input_img = Variable(TVT(img.float()))
+        input_img = Variable(img.float())
         f, sf = model(input_img)
         # count += n
 
