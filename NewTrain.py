@@ -123,6 +123,8 @@ def train_model(model, optimizer, scheduler, num_epochs):
 
     st_time = time.time()
 
+    criterion = nn.CrossEntropyLoss()
+
     for epoch in range(num_epochs):
         print ('Now {} epochs, total {} epochs'.format(epoch, num_epochs))
         print ('*' * 12)
@@ -135,6 +137,7 @@ def train_model(model, optimizer, scheduler, num_epochs):
         running_corrects = 0
         step = 0
         loss = 0.0
+        acc = 0
 
         prec_meter = AverageMeter()
         sm_meter = AverageMeter()
@@ -146,7 +149,7 @@ def train_model(model, optimizer, scheduler, num_epochs):
             step += 1
             inputs, labels = data
             inputs = Variable(inputs.float().cuda())
-            labels = labels.long().cuda()
+            labels = Variable(labels.long().cuda())
 
             # inputs = Variable(TVT(inputs.float()))
             # labels = TVT(labels.long())
@@ -154,10 +157,9 @@ def train_model(model, optimizer, scheduler, num_epochs):
             optimizer.zero_grad()
 
             logits, outputs_spatialFeature = model(inputs) 
-
-            loss = nn.CrossEntropyLoss(nn.Softmax(logits), labels)
-
-            _, pred = torch.max(nn.Softmax(logits), 1)
+            temp = torch.nn.functional.softmax(logits, dim=1)
+            loss = criterion(temp, labels)
+            _, preds = torch.max(temp, 1)
 
             # DSR AND TRIPLET LOSS ADD IN HERE
             #################################################
@@ -209,7 +211,7 @@ def train_model(model, optimizer, scheduler, num_epochs):
 
         # y_loss.append(epoch_loss)
         # y_err.append(1.0 - epoch_acc)
-        acc = running_corrects / (step * batch_size)
+        acc = float(running_corrects) / (step * args.batch_size)
         time_log = 'Ep {}, {:.2f}s'.format(epoch + 1, time.time() - st_time)
 
         #tri_log = (', prec {:.2%}, sm {:.2%}, '
@@ -218,7 +220,9 @@ def train_model(model, optimizer, scheduler, num_epochs):
         #prec_meter.avg, sm_meter.avg,
         #dist_ap_meter.avg, dist_an_meter.avg,
         #loss_meter.avg, ))
-        tri_log = ' loss: {:.2f} acc: {:.2f}'.format(loss, acc)
+        #pdb.set_trace()
+        loss_print = loss.data.cpu().numpy()[0]
+        tri_log = " loss: {:.2f}".format(loss_print)
 
         log = time_log + tri_log
         print(log)

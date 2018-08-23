@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from .resnet import resnet50
+import pdb
 
 
 class Model(nn.Module):
@@ -24,7 +25,7 @@ class Model(nn.Module):
     x = self.bn1(x)
     x = self.relu(x)
     feature = x
-    logits = self.fc(feature)
+    #logits = self.fc(feature)
     x1 = self.AvgPool1(x)
     x2 = self.AvgPool2(x)
     # x3 = self.AvgPool3(x)
@@ -39,6 +40,7 @@ class Model(nn.Module):
 
     feature = F.avg_pool2d(feature, feature.size()[2:])
     feature = feature.view(feature.size(0), -1)
+    logits = self.fc(feature)
 
     spatialFeature = torch.cat((x, x1, x2), 2)
 
