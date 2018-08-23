@@ -79,7 +79,7 @@ dataloaders = torch.utils.data.DataLoader(image_datasets['train'], batch_size=ar
 y_loss = []
 y_err = []
 
-model = ft_net(1501)
+model = ft_net(751)
 #model = Model()
 
 
@@ -95,10 +95,10 @@ tri_loss = TripletLoss(margin)
 ignored_params = list(map(id, model.model.fc.parameters() )) + list(map(id, model.classifier.parameters() ))
 
 base_params = filter(lambda p: id(p) not in ignored_params, model.parameters())
-base_params = model.parameters()
+#base_params = model.parameters()
 
 optimizer_ft = optim.SGD([
-             {'params': base_params, 'lr': 0.01}
+             {'params': base_params, 'lr': 0.01},
              {'params': model.model.fc.parameters(), 'lr': 0.1},
              {'params': model.classifier.parameters(), 'lr': 0.1}
          ], weight_decay=5e-4, momentum=0.9, nesterov=True)
@@ -158,10 +158,11 @@ def train_model(model, optimizer, scheduler, num_epochs):
 
             optimizer.zero_grad()
 
-            logits, outputs_spatialFeature = model(inputs) 
-            temp = torch.nn.functional.softmax(logits, dim=1)
-            loss = criterion(temp, labels)
-            _, preds = torch.max(temp, 1)
+            #logits, outputs_spatialFeature = model(inputs) 
+            #temp = torch.nn.functional.softmax(logits, dim=1)
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+            _, preds = torch.max(outputs.data, 1)
 
             # DSR AND TRIPLET LOSS ADD IN HERE
             #################################################
@@ -174,7 +175,7 @@ def train_model(model, optimizer, scheduler, num_epochs):
             loss.backward()
             optimizer.step()
 
-            running_corrects += torch.sum(preds == labels)
+            running_corrects += torch.sum(preds == labels.data)
 
             #prec = (dist_an > dist_ap).data.float().mean()
             # the proportion of triplets that satisfy margin
