@@ -222,7 +222,7 @@ def train_model(model, optimizer, scheduler, num_epochs):
         #loss_meter.avg, ))
         #pdb.set_trace()
         loss_print = loss.data.cpu().numpy()[0]
-        tri_log = " loss: {:.2f}".format(loss_print)
+        tri_log = " loss: {:.5f}, acc: {:.2f}".format(loss_print, acc)
 
         log = time_log + tri_log
         print(log)
