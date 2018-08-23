@@ -21,6 +21,7 @@ import json
 from utils.sampler import RandomIdentitySampler
 from utils.resnet import resnet50
 from utils.Model import Model
+from model import ft_net
 from utils.TripletLoss import TripletLoss
 from utils.loss import global_loss
 from utils.utils import AverageMeter
@@ -78,8 +79,9 @@ dataloaders = torch.utils.data.DataLoader(image_datasets['train'], batch_size=ar
 y_loss = []
 y_err = []
 
-# model = ft_net(len(class_names))
-model = Model()
+model = ft_net(1501)
+#model = Model()
+
 
 os.environ['CUDA_VISIBLE_DEVICES'] = args.sys_device_ids
 
@@ -90,15 +92,15 @@ margin = args.margin
 
 tri_loss = TripletLoss(margin)
 
-#ignored_params = list(map(id, model.model.fc.parameters() )) + list(map(id, model.classifier.parameters() ))
+ignored_params = list(map(id, model.model.fc.parameters() )) + list(map(id, model.classifier.parameters() ))
 
-#base_params = filter(lambda p: id(p) not in ignored_params, model.parameters())
+base_params = filter(lambda p: id(p) not in ignored_params, model.parameters())
 base_params = model.parameters()
 
 optimizer_ft = optim.SGD([
              {'params': base_params, 'lr': 0.01}
-             # {'params': model.model.fc.parameters(), 'lr': 0.1},
-             # {'params': model.classifier.parameters(), 'lr': 0.1}
+             {'params': model.model.fc.parameters(), 'lr': 0.1},
+             {'params': model.classifier.parameters(), 'lr': 0.1}
          ], weight_decay=5e-4, momentum=0.9, nesterov=True)
 
 exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=args.lr_decay_epochs, gamma=0.1)
