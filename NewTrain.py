@@ -79,8 +79,8 @@ dataloaders = torch.utils.data.DataLoader(image_datasets['train'], batch_size=ar
 y_loss = []
 y_err = []
 
-model = ft_net(751)
-#model = Model()
+# model = ft_net(751)
+model = Model()
 
 
 os.environ['CUDA_VISIBLE_DEVICES'] = args.sys_device_ids
@@ -161,7 +161,10 @@ def train_model(model, optimizer, scheduler, num_epochs):
             #logits, outputs_spatialFeature = model(inputs) 
             #temp = torch.nn.functional.softmax(logits, dim=1)
             outputs = model(inputs)
-            loss = criterion(outputs, labels)
+            FC = nn.Linear(2048, 751)
+            logits = FC(outputs)
+            logits = nn.softmax(logits)
+            loss = criterion(logits, labels)
             _, preds = torch.max(outputs.data, 1)
 
             # DSR AND TRIPLET LOSS ADD IN HERE
