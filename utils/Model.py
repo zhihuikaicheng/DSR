@@ -1,17 +1,27 @@
 import torch
 import torch.nn as nn
+from torch.nn import init
 import torch.nn.functional as F
 
 # from .resnet import resnet50
 from torchvision import models
 import pdb
 
+def weights_init_classifier(m):
+    classname = m.__class__.__name__
+    if classname.find('Linear') != -1:
+        init.normal(m.weight.data, std=0.001)
+        init.constant(m.bias.data, 0.0)
 
 class Model(nn.Module):
   def __init__(self, last_conv_stride=2):
     super(Model, self).__init__()
     # self.base = resnet50(pretrained=True, last_conv_stride=last_conv_stride)
     self.base = models.resnet50(pretrained=True)
+    self.classifier = []
+    self.classifier += [nn.Linear(2048, 751)]
+    self.classifier = nn.Sequential(*classifier)
+    self.classifier.apply(weights_init_classifier)
     # self.base.avgpool = nn.AdaptiveAvgPool2d((1,1))
     # self.AvgPool1 = nn.AvgPool2d(kernel_size=2, stride=1, padding=0)
     # self.AvgPool2 = nn.AvgPool2d(kernel_size=3, stride=1, padding=0)
@@ -36,7 +46,7 @@ class Model(nn.Module):
     x = self.base.layer4(x)
     # x = self.base.avgpool(x)
     # x = self.base(x)
-    feature = x
+
     #logits = self.fc(feature)
     # x1 = self.AvgPool1(x)
     # x2 = self.AvgPool2(x)
@@ -50,10 +60,14 @@ class Model(nn.Module):
     # x4 = x4.view(x4.size(0), x4.size(1), x4.size(2) * x4.size(3))
     # x5 = x5.view(x5.size(0), x5.size(1), x5.size(2) * x5.size(3))
 
-    feature = F.avg_pool2d(feature, feature.size()[2:])
-    feature = feature.view(feature.size(0), -1)
+    x = F.avg_pool2d(x, x.size()[2:])
+    x = x.view(x.size(0), -1)
+
+    feature = x
+
+    x = self.classifier(x)
 
     # spatialFeature = torch.cat((x, x1, x2), 2)
 
     # return feature, spatialFeature
-    return feature
+    return x, feature

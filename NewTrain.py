@@ -167,14 +167,8 @@ def train_model(model, optimizer, scheduler, num_epochs):
 
             #logits, outputs_spatialFeature = model(inputs) 
             #temp = torch.nn.functional.softmax(logits, dim=1)
-            outputs = model(inputs)
-            classifier = []
-            classifier += [nn.Linear(2048, 751)]
-            classifier = nn.Sequential(*classifier)
-            classifier.apply(weights_init_classifier)
-            classifier.cuda()
-            logits = classifier(outputs)
-            logits = nn.functional.softmax(logits)
+            logits, _ = model(inputs)
+            logits = nn.Softmax(logits)
 
             loss = criterion(logits, labels)
             _, preds = torch.max(logits.data, 1)
