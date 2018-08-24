@@ -96,7 +96,7 @@ tri_loss = TripletLoss(margin)
 # ignored_params = list(map(id, model.model.fc.parameters() )) + list(map(id, model.classifier.parameters() ))
 
 # base_params = filter(lambda p: id(p) not in ignored_params, model.parameters())
-base_params = filter(model.parameters())
+base_params = model.parameters()
 
 optimizer_ft = optim.SGD([
              {'params': base_params, 'lr': 0.01}
