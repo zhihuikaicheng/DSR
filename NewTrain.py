@@ -96,10 +96,10 @@ tri_loss = TripletLoss(margin)
 # ignored_params = list(map(id, model.model.fc.parameters() )) + list(map(id, model.classifier.parameters() ))
 
 # base_params = filter(lambda p: id(p) not in ignored_params, model.parameters())
-base_params = model.parameters()
+base_params = filter(model.parameters())
 
 optimizer_ft = optim.SGD([
-             {'params': base_params, 'lr': 0.01},
+             {'params': base_params, 'lr': 0.01}
              # {'params': model.model.fc.parameters(), 'lr': 0.1},
              # {'params': model.classifier.parameters(), 'lr': 0.1}
          ], weight_decay=5e-4, momentum=0.9, nesterov=True)
@@ -170,7 +170,7 @@ def train_model(model, optimizer, scheduler, num_epochs):
             # DSR AND TRIPLET LOSS ADD IN HERE
             #################################################
             #loss, p_inds, n_inds, dist_ap, dist_an, dist_mat = global_loss(
-            #    tri_loss, outputs_x, outputs_spatialFeature, labels,
+            #    trhi_loss, outputs_x, outputs_spatialFeature, labels,
             #    normalize_feature=False) 
 
             #################################################
