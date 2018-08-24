@@ -174,9 +174,7 @@ def train_model(model, optimizer, scheduler, num_epochs):
             classifier.apply(weights_init_classifier)
             classifier.cuda()
             logits = classifier(outputs)
-            softmax = nn.functional.softmax
-            softmax.cuda()
-            logits = softmax(logits)
+            logits = nn.functional.softmax(logits)
 
             loss = criterion(logits, labels)
             _, preds = torch.max(logits.data, 1)
