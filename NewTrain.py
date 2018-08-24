@@ -172,7 +172,7 @@ def train_model(model, optimizer, scheduler, num_epochs):
             classifier += [nn.Linear(2048, 751)]
             classifier = nn.Sequential(*classifier)
             classifier.apply(weights_init_classifier)
-            logits = classifier(outputs)
+            logits = classifier(outputs.cpu())
             logits = nn.softmax(logits)
 
             loss = criterion(logits, labels)
