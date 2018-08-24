@@ -162,7 +162,6 @@ def train_model(model, optimizer, scheduler, num_epochs):
             #logits, outputs_spatialFeature = model(inputs) 
             #temp = torch.nn.functional.softmax(logits, dim=1)
             logits, _ = model(inputs)
-            logits = nn.functional.softmax(logits)
 
             loss = criterion(logits, labels)
             _, preds = torch.max(logits.data, 1)
