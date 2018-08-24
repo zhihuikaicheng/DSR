@@ -175,7 +175,7 @@ def train_model(model, optimizer, scheduler, num_epochs):
             classifier.cuda()
             logits = classifier(outputs)
             softmax = nn.functional.softmax
-            sofrmax.cuda()
+            softmax.cuda()
             logits = softmax(logits)
 
             loss = criterion(logits, labels)
