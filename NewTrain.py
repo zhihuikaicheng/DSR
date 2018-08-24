@@ -3,6 +3,7 @@ from __future__ import print_function, division
 import argparse
 import torch
 import torch.nn as nn
+from torch.nn import init
 import torch.optim as optim
 import pdb
 import time
