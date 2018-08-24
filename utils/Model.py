@@ -12,7 +12,7 @@ class Model(nn.Module):
     super(Model, self).__init__()
     # self.base = resnet50(pretrained=True, last_conv_stride=last_conv_stride)
     self.base = models.resnet50(pretrained=True)
-    self.base.avgpool = nn.AdaptiveAvgPool2d((1,1))
+    # self.base.avgpool = nn.AdaptiveAvgPool2d((1,1))
     # self.AvgPool1 = nn.AvgPool2d(kernel_size=2, stride=1, padding=0)
     # self.AvgPool2 = nn.AvgPool2d(kernel_size=3, stride=1, padding=0)
     # self.AvgPool3 = nn.AvgPool2d(kernel_size=4, stride=1, padding=0)
@@ -26,7 +26,16 @@ class Model(nn.Module):
 
   def forward(self, x):
     # shape [N, C, H, W]
-    x = self.base(x)
+    x = self.base.conv1(x)
+    x = self.base.bn1(x)
+    x = self.base.relu(x)
+    x = self.base.maxpool(x)
+    x = self.base.layer1(x)
+    x = self.base.layer2(x)
+    x = self.base.layer3(x)
+    x = self.base.layer4(x)
+    # x = self.base.avgpool(x)
+    # x = self.base(x)
     feature = x
     #logits = self.fc(feature)
     # x1 = self.AvgPool1(x)
