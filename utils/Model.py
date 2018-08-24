@@ -18,10 +18,11 @@ class Model(nn.Module):
     super(Model, self).__init__()
     # self.base = resnet50(pretrained=True, last_conv_stride=last_conv_stride)
     self.base = models.resnet50(pretrained=True)
-    self.classifier = []
-    self.classifier += [nn.Linear(2048, 751)]
-    self.classifier = nn.Sequential(*classifier)
-    self.classifier.apply(weights_init_classifier)
+    classifier = []
+    classifier += [nn.Linear(2048, 751)]
+    classifier = nn.Sequential(*classifier)
+    classifier.apply(weights_init_classifier)
+    self.classifier = classifier
     # self.base.avgpool = nn.AdaptiveAvgPool2d((1,1))
     # self.AvgPool1 = nn.AvgPool2d(kernel_size=2, stride=1, padding=0)
     # self.AvgPool2 = nn.AvgPool2d(kernel_size=3, stride=1, padding=0)
