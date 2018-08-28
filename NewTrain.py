@@ -36,8 +36,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--sys_device_ids', type=str, default='1')
 parser.add_argument('--dataset_dir', type=str)
 parser.add_argument('--margin', type=float, default=0.3)
-parser.add_argument('--num_epochs', type=int, default=120)
-parser.add_argument('--lr_decay_epochs', type=int, default=40)
+parser.add_argument('--num_epochs', type=int, default=1000)
+parser.add_argument('--lr_decay_epochs', type=int, default=625)
 parser.add_argument('--steps_per_log', type=int, default=1)
 parser.add_argument('--model_save_dir', type=str)
 parser.add_argument('--img_h', type=int, default=256)
@@ -74,9 +74,6 @@ dataloaders = torch.utils.data.DataLoader(image_datasets['train'], batch_size=ar
 
 ##############################################
 
-y_loss = []
-y_err = []
-
 # model = ft_net(751)
 model = Model()
 
@@ -95,7 +92,7 @@ tri_loss = TripletLoss(margin)
 base_params = model.parameters()
 
 optimizer_ft = optim.SGD([
-             {'params': base_params, 'lr': 0.1}
+             {'params': base_params, 'lr': 0.01}
              # {'params': model.model.fc.parameters(), 'lr': 0.1},
              # {'params': model.classifier.parameters(), 'lr': 0.1}
          ], weight_decay=5e-4, momentum=0.9, nesterov=True)
@@ -155,7 +152,7 @@ def train_model(model, optimizer, scheduler, num_epochs):
 
             optimizer.zero_grad()
 
-            outputs_f, outputs_sf = model(inputs)
+            outputs_f = model(inputs)
 
             # loss = criterion(logits, labels)
             # _, preds = torch.max(logits.data, 1)
@@ -163,7 +160,7 @@ def train_model(model, optimizer, scheduler, num_epochs):
             # DSR AND TRIPLET LOSS ADD IN HERE
             #################################################
             loss, p_inds, n_inds, dist_ap, dist_an, dist_mat = global_loss(
-               tri_loss, global_feat=outputs_f, global_feat1=outputs_sf, labels=labels,
+               tri_loss, global_feat=outputs_f, global_feat1=None, labels=labels,
                normalize_feature=False) 
 
             #################################################
