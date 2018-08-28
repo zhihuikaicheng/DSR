@@ -20,7 +20,6 @@ import time
 import os
 import json
 from utils.sampler import RandomIdentitySampler
-from utils.resnet import resnet50
 from utils.Model import Model
 from model import ft_net
 from utils.TripletLoss import TripletLoss
@@ -38,7 +37,7 @@ parser.add_argument('--sys_device_ids', type=str, default='1')
 parser.add_argument('--dataset_dir', type=str)
 parser.add_argument('--margin', type=float, default=0.3)
 parser.add_argument('--num_epochs', type=int, default=120)
-parser.add_argument('--lr_decay_epochs', type=int, default=80)
+parser.add_argument('--lr_decay_epochs', type=int, default=40)
 parser.add_argument('--steps_per_log', type=int, default=1)
 parser.add_argument('--model_save_dir', type=str)
 parser.add_argument('--img_h', type=int, default=256)
@@ -48,8 +47,6 @@ parser.add_argument('--batch_size', type=int, default=128)
 args = parser.parse_args()
 
 ##############################################
-
-# os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu_use
 
 #data input
 ##############################################
@@ -98,7 +95,7 @@ tri_loss = TripletLoss(margin)
 base_params = model.parameters()
 
 optimizer_ft = optim.SGD([
-             {'params': base_params, 'lr': 0.01}
+             {'params': base_params, 'lr': 0.1}
              # {'params': model.model.fc.parameters(), 'lr': 0.1},
              # {'params': model.classifier.parameters(), 'lr': 0.1}
          ], weight_decay=5e-4, momentum=0.9, nesterov=True)
@@ -158,9 +155,6 @@ def train_model(model, optimizer, scheduler, num_epochs):
 
             optimizer.zero_grad()
 
-            #logits, outputs_spatialFeature = model(inputs) 
-            #temp = torch.nn.functional.softmax(logits, dim=1)
-            # logits, _ = model(inputs)
             outputs_f, outputs_sf = model(inputs)
 
             # loss = criterion(logits, labels)
