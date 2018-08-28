@@ -192,19 +192,19 @@ def train_model(model, optimizer, scheduler, num_epochs):
             dist_ap_meter.update(d_ap)
             dist_an_meter.update(d_an)
             loss_meter.update(to_scalar(loss))
-            if step % args.steps_per_log == 0:
-                time_log = '\tStep {}/Ep {}, {:.2f}s'.format(
-                  step, ep + 1, time.time() - step_st, )
+            # if step % args.steps_per_log == 0:
+            #     time_log = '\tStep {}/Ep {}, {:.2f}s'.format(
+            #       step, ep + 1, time.time() - step_st, )
 
-                tri_log = (', prec {:.2%}, sm {:.2%}, '
-                       'd_ap {:.4f}, d_an {:.4f}, '
-                       'loss {:.4f}'.format(
-                prec_meter.val, sm_meter.val,
-                dist_ap_meter.val, dist_an_meter.val,
-                loss_meter.val, ))
+            #     tri_log = (', prec {:.2%}, sm {:.2%}, '
+            #            'd_ap {:.4f}, d_an {:.4f}, '
+            #            'loss {:.4f}'.format(
+            #     prec_meter.val, sm_meter.val,
+            #     dist_ap_meter.val, dist_an_meter.val,
+            #     loss_meter.val, ))
 
-                log = time_log + tri_log
-                print(log)
+            #     log = time_log + tri_log
+            #     print(log)
 
         #     running_loss += loss.data[0]
         #     running_corrects += torch.sum(preds == labels.data)
@@ -217,20 +217,20 @@ def train_model(model, optimizer, scheduler, num_epochs):
         # y_loss.append(epoch_loss)
         # y_err.append(1.0 - epoch_acc)
         # acc = float(running_corrects) / (step * args.batch_size)
-        # time_log = 'Ep {}, {:.2f}s'.format(epoch + 1, time.time() - st_time)
+        time_log = 'Ep {}, {:.2f}s'.format(epoch + 1, time.time() - st_time)
 
-        #tri_log = (', prec {:.2%}, sm {:.2%}, '
-        #       'd_ap {:.4f}, d_an {:.4f}, '
-        #       'loss {:.4f}'.format(
-        #prec_meter.avg, sm_meter.avg,
-        #dist_ap_meter.avg, dist_an_meter.avg,
-        #loss_meter.avg, ))
-        #pdb.set_trace()
+        tri_log = (', prec {:.2%}, sm {:.2%}, '
+              'd_ap {:.4f}, d_an {:.4f}, '
+              'loss {:.4f}'.format(
+        prec_meter.avg, sm_meter.avg,
+        dist_ap_meter.avg, dist_an_meter.avg,
+        loss_meter.avg, ))
+
         # loss_print = loss.data.cpu().numpy()[0]
         # tri_log = " loss: {:.5f}, acc: {:.2f}".format(loss_print, acc)
 
-        # log = time_log + tri_log
-        # print(log)
+        log = time_log + tri_log
+        print(log)
 
 
 
