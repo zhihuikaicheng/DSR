@@ -49,14 +49,14 @@ class Model(nn.Module):
     # x = self.base(x)
 
     #logits = self.fc(feature)
-    # x1 = self.AvgPool1(x)
-    # x2 = self.AvgPool2(x)
+    x1 = self.AvgPool1(x)
+    x2 = self.AvgPool2(x)
     # x3 = self.AvgPool3(x)
     # x4 = self.AvgPool4(x)
     # x5 = self.AvgPool5(x)
     # x = x.view(x.size(0), x.size(1), x.size(2) * x.size(3))
-    # x1 = x1.view(x1.size(0), x1.size(1), x1.size(2) * x1.size(3))
-    # x2 = x2.view(x2.size(0), x2.size(1), x2.size(2) * x2.size(3))
+    x1 = x1.view(x1.size(0), x1.size(1), x1.size(2) * x1.size(3))
+    x2 = x2.view(x2.size(0), x2.size(1), x2.size(2) * x2.size(3))
     # x3 = x3.view(x3.size(0), x3.size(1), x3.size(2) * x3.size(3))
     # x4 = x4.view(x4.size(0), x4.size(1), x4.size(2) * x4.size(3))
     # x5 = x5.view(x5.size(0), x5.size(1), x5.size(2) * x5.size(3))
@@ -68,8 +68,8 @@ class Model(nn.Module):
 
     # x = self.classifier(x)
 
-    # spatialFeature = torch.cat((x, x1, x2), 2)
+    spatialFeature = torch.cat((x, x1, x2), 2)
 
-    # return feature, spatialFeature
-    return feature
+    return feature, spatialFeature
+    # return feature
     # return x, feature

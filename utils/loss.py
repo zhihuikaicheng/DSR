@@ -192,16 +192,16 @@ def global_loss(tri_loss, global_feat, global_feat1, labels, normalize_feature=T
   """
   if normalize_feature:
     global_feat = normalize(global_feat, axis=-1)
-  ##global_feat1 = normalize1(global_feat1, axis=-1)
+    # global_feat1 = normalize1(global_feat1, axis=-1)
   # shape [N, N]
   dist_mat = euclidean_dist(global_feat, global_feat)
   #dist_mat1 = dsr_dist(global_feat1, global_feat1)
   #dist_mat2 = dist_mat + dist_mat1
   dist_ap, dist_an, p_inds, n_inds = hard_example_mining(
     dist_mat, labels, return_inds=True)
-  # dist_n, dist_p = DSR_L(global_feat1, global_feat1, p_inds, n_inds)
-  # loss1 = tri_loss(dist_p, dist_n)
+  dist_n, dist_p = DSR_L(global_feat1, global_feat1, p_inds, n_inds)
+  loss1 = tri_loss(dist_p, dist_n)
   #print(len(p_inds))
   loss2 = tri_loss(dist_ap, dist_an)
-  loss = loss2
+  loss = loss2 + loss1
   return loss, p_inds, n_inds, dist_ap, dist_an, dist_mat

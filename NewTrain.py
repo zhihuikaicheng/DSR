@@ -37,8 +37,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--sys_device_ids', type=str, default='1')
 parser.add_argument('--dataset_dir', type=str)
 parser.add_argument('--margin', type=float, default=0.3)
-parser.add_argument('--num_epochs', type=int, default=100)
-parser.add_argument('--lr_decay_epochs', type=int, default=60)
+parser.add_argument('--num_epochs', type=int, default=120)
+parser.add_argument('--lr_decay_epochs', type=int, default=80)
 parser.add_argument('--steps_per_log', type=int, default=1)
 parser.add_argument('--model_save_dir', type=str)
 parser.add_argument('--img_h', type=int, default=256)
@@ -161,7 +161,7 @@ def train_model(model, optimizer, scheduler, num_epochs):
             #logits, outputs_spatialFeature = model(inputs) 
             #temp = torch.nn.functional.softmax(logits, dim=1)
             # logits, _ = model(inputs)
-            outputs = model(inputs)
+            outputs_f, outputs_sf = model(inputs)
 
             # loss = criterion(logits, labels)
             # _, preds = torch.max(logits.data, 1)
@@ -169,7 +169,7 @@ def train_model(model, optimizer, scheduler, num_epochs):
             # DSR AND TRIPLET LOSS ADD IN HERE
             #################################################
             loss, p_inds, n_inds, dist_ap, dist_an, dist_mat = global_loss(
-               tri_loss, outputs, global_feat1=None, labels=labels,
+               tri_loss, global_feat=outputs_f, global_feat1=outputs_sf, labels=labels,
                normalize_feature=False) 
 
             #################################################
