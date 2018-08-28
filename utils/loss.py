@@ -199,9 +199,9 @@ def global_loss(tri_loss, global_feat, global_feat1, labels, normalize_feature=T
   #dist_mat2 = dist_mat + dist_mat1
   dist_ap, dist_an, p_inds, n_inds = hard_example_mining(
     dist_mat, labels, return_inds=True)
-  dist_n, dist_p = DSR_L(global_feat1, global_feat1, p_inds, n_inds)
-  loss1 = tri_loss(dist_p, dist_n)
+  # dist_n, dist_p = DSR_L(global_feat1, global_feat1, p_inds, n_inds)
+  # loss1 = tri_loss(dist_p, dist_n)
   #print(len(p_inds))
   loss2 = tri_loss(dist_ap, dist_an)
-  loss = loss1 + loss2
+  loss = loss2
   return loss, p_inds, n_inds, dist_ap, dist_an, dist_mat

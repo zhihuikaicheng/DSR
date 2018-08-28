@@ -67,7 +67,6 @@ def load_network(network):
     return network
 
 model = Model() #last_conv_stride=args.last_conv_stride
-#model = ft_net(751)
 # TVT, TMO = set_devices(args.sys_device_ids)
 # model = DataParallel(model)
 model.cuda()
@@ -101,7 +100,7 @@ def save_feature(part, features, special_features, labels, cams=None, Is_gallery
         #result_sf = {part_feat: special_features, part_label: labels, part_cam: cams}
     else:
         result_f = {part_feat: features, part_label: labels}
-        result_sf = {part_feat: special_features, part_label: labels}
+        # result_sf = {part_feat: special_features, part_label: labels}
 
     if Is_gallery:
         scipy.io.savemat(os.path.join(args.gallery_feature_dir, 'pytorch_result_gallery_{:d}.mat'.format(part)), result_f)
@@ -132,7 +131,7 @@ def extract_feature(model, dataloaders, Is_gallery=True, useCAM=False):
         input_img = Variable(img.float().cuda())
         #f, sf = model(input_img)
         #pdb.set_trace()
-        _, f = model(input_img)
+        f = model(input_img)
         # count += n
 
         # print(count)

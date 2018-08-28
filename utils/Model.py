@@ -18,16 +18,16 @@ class Model(nn.Module):
     super(Model, self).__init__()
     # self.base = resnet50(pretrained=True, last_conv_stride=last_conv_stride)
     self.base = models.resnet50(pretrained=True)
-    classifier = []
-    classifier += [nn.Linear(2048, 751)]
-    classifier = nn.Sequential(*classifier)
-    classifier.apply(weights_init_classifier)
-    self.classifier = classifier
+    # classifier = []
+    # classifier += [nn.Linear(2048, 751)]
+    # classifier = nn.Sequential(*classifier)
+    # classifier.apply(weights_init_classifier)
+    # self.classifier = classifier
     # self.base.avgpool = nn.AdaptiveAvgPool2d((1,1))
-    # self.AvgPool1 = nn.AvgPool2d(kernel_size=2, stride=1, padding=0)
-    # self.AvgPool2 = nn.AvgPool2d(kernel_size=3, stride=1, padding=0)
-    # self.AvgPool3 = nn.AvgPool2d(kernel_size=4, stride=1, padding=0)
-    # self.AvgPool4 = nn.AvgPool2d(kernel_size=5, stride=1, padding=0)
+    self.AvgPool1 = nn.AvgPool2d(kernel_size=2, stride=1, padding=0)
+    self.AvgPool2 = nn.AvgPool2d(kernel_size=3, stride=1, padding=0)
+    self.AvgPool3 = nn.AvgPool2d(kernel_size=4, stride=1, padding=0)
+    self.AvgPool4 = nn.AvgPool2d(kernel_size=5, stride=1, padding=0)
     # self.AvgPool5 = nn.AvgPool2d((16, 8), stride=16)
     #self.conv1 = nn.Conv2d(2048, 256, 1, 1, 0)
     # self.fc1 = nn.
@@ -66,9 +66,10 @@ class Model(nn.Module):
 
     feature = x
 
-    x = self.classifier(x)
+    # x = self.classifier(x)
 
     # spatialFeature = torch.cat((x, x1, x2), 2)
 
     # return feature, spatialFeature
-    return x, feature
+    return feature
+    # return x, feature
