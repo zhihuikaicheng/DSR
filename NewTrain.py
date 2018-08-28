@@ -169,7 +169,7 @@ def train_model(model, optimizer, scheduler, num_epochs):
             # DSR AND TRIPLET LOSS ADD IN HERE
             #################################################
             loss, p_inds, n_inds, dist_ap, dist_an, dist_mat = global_loss(
-               trhi_loss, outputs_x, outputs_spatialFeature, labels,
+               tri_loss, outputs, global_feat1=None, labels=labels,
                normalize_feature=False) 
 
             #################################################
