@@ -37,8 +37,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--sys_device_ids', type=str, default='1')
 parser.add_argument('--dataset_dir', type=str)
 parser.add_argument('--margin', type=float, default=0.3)
-parser.add_argument('--num_epochs', type=int, default=200)
-parser.add_argument('--lr_decay_epochs', type=int, default=40)
+parser.add_argument('--num_epochs', type=int, default=100)
+parser.add_argument('--lr_decay_epochs', type=int, default=60)
 parser.add_argument('--steps_per_log', type=int, default=1)
 parser.add_argument('--model_save_dir', type=str)
 parser.add_argument('--img_h', type=int, default=256)
@@ -151,7 +151,7 @@ def train_model(model, optimizer, scheduler, num_epochs):
             step += 1
             inputs, labels = data
             inputs = Variable(inputs.float().cuda())
-            labels = Variable(labels.long().cuda())
+            labels = labels.long().cuda()
 
             # inputs = Variable(TVT(inputs.float()))
             # labels = TVT(labels.long())
