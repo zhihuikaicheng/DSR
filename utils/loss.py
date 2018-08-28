@@ -192,7 +192,7 @@ def global_loss(tri_loss, global_feat, global_feat1, labels, normalize_feature=T
   """
   if normalize_feature:
     global_feat = normalize(global_feat, axis=-1)
-    # global_feat1 = normalize1(global_feat1, axis=-1)
+    global_feat1 = normalize1(global_feat1, axis=-1)
   # shape [N, N]
   dist_mat = euclidean_dist(global_feat, global_feat)
   #dist_mat1 = dsr_dist(global_feat1, global_feat1)
