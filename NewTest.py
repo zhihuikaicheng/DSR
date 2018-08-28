@@ -33,7 +33,7 @@ import scipy
 #args
 ##############################################
 parser = argparse.ArgumentParser()
-parser.add_argument('--sys_device_ids', type=str, default='0')
+parser.add_argument('--sys_device_ids', type=str, default='7')
 parser.add_argument('--test_dir', type=str)
 parser.add_argument('--margin', type=float, default=0.3)
 parser.add_argument('--model_save_dir', type=str)
@@ -66,8 +66,8 @@ def load_network(network):
     network.load_state_dict(torch.load(save_path))
     return network
 
-#model = Model() #last_conv_stride=args.last_conv_stride
-model = ft_net(751)
+model = Model() #last_conv_stride=args.last_conv_stride
+#model = ft_net(751)
 # TVT, TMO = set_devices(args.sys_device_ids)
 # model = DataParallel(model)
 model.cuda()
@@ -131,7 +131,8 @@ def extract_feature(model, dataloaders, Is_gallery=True, useCAM=False):
         
         input_img = Variable(img.float().cuda())
         #f, sf = model(input_img)
-        f = model(input_img)
+        #pdb.set_trace()
+        _, f = model(input_img)
         # count += n
 
         # print(count)
@@ -151,7 +152,7 @@ def extract_feature(model, dataloaders, Is_gallery=True, useCAM=False):
         #     lab = next(labelsloader)
         #     label = get_id(lab)
         #     labels.append(label)
-        
+        #features.append(f)
         features.append(f.data.cpu())
         #special_features.append(sf.data.cpu())
         labels.append(label)
