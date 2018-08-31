@@ -164,7 +164,7 @@ def train_model(model, optimizer, scheduler, num_epochs):
             #################################################
             loss, p_inds, n_inds, dist_ap, dist_an, dist_mat = global_loss(
                tri_loss, global_feat=outputs_f, global_feat1=outputs_sf, labels=labels,
-               normalize_feature=False) 
+               normalize_feature=True) 
 
             #################################################
 
