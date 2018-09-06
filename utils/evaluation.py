@@ -5,6 +5,7 @@ import numpy as np
 import torch
 import pdb
 from sklearn.metrics import average_precision_score
+from utils import normalize, normalize1
 
 def to_numpy(tensor):
     if torch.is_tensor(tensor):
@@ -132,8 +133,8 @@ def compute_dist2(array1, array2, type='euclidean'):
         numpy array with shape [m1, m2]
     """
 
-    #array1 = normalize(array1, axis=1)
-    #array2 = normalize(array2, axis=1)
+    array1 = normalize(array1, axis=1)
+    array2 = normalize(array2, axis=1)
     assert type in ['cosine', 'euclidean']
     if type == 'cosine':
         array1 = normalize(array1, axis=1)
@@ -151,8 +152,8 @@ def compute_dist2(array1, array2, type='euclidean'):
     return dist
 
 def dsr_dist(array1, array2, type='euclidean'):
-    #array1 = normalize1(array1, axis=1) 
-    #array2 = normalize1(array2, axis=1)
+    array1 = normalize1(array1, axis=1) 
+    array2 = normalize1(array2, axis=1)
     assert type in ['cosine', 'euclidean']
     if type == 'cosine':
         array1 = normalize(array1, axis=1)

@@ -35,7 +35,7 @@ import scipy
 parser = argparse.ArgumentParser()
 parser.add_argument('--sys_device_ids', type=str, default='7')
 parser.add_argument('--test_dir', type=str)
-parser.add_argument('--margin', type=float, default=0.3)
+parser.add_argument('--margin', type=float, default=0.1)
 parser.add_argument('--model_save_dir', type=str)
 parser.add_argument('--batch_size', default=128, type=int, help='batch_size')
 parser.add_argument('--img_h', type=int, default=256)

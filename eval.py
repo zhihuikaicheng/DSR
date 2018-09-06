@@ -8,7 +8,8 @@ import os
 from utils.evaluation import cmc, mean_ap
 from utils.evaluation import compute_dist2, dsr_dist
 import pdb
-os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2"
+
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 #args
 ##############################################
 parser = argparse.ArgumentParser()
@@ -64,7 +65,6 @@ q_g_dist2 = dsr_dist(query_feature, gallery_feature, type='euclidean')
 for ad in range(0, 11):
     lam = ad*0.1
     q_g_dist = (1-lam) * q_g_dist1 + lam * q_g_dist2
-    q_g_dist = q_g_dist1
     res_rank = cmc(q_g_dist, query_label, gallery_label, query_cam, gallery_cam, first_match_break=True)
     res_map = mean_ap(q_g_dist, query_label, gallery_label, query_cam, gallery_cam)
     print('''ad:{:d}'''.format(ad))

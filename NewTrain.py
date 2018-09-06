@@ -35,7 +35,7 @@ parser = argparse.ArgumentParser()
 # parser.add_argument('--sys_device_ids', type=eval, default=(0,1,2,3))
 parser.add_argument('--sys_device_ids', type=str, default='1')
 parser.add_argument('--dataset_dir', type=str)
-parser.add_argument('--margin', type=float, default=0.3)
+parser.add_argument('--margin', type=float, default=0.1)
 parser.add_argument('--num_epochs', type=int, default=800)
 parser.add_argument('--lr_decay_epochs', type=int, default=550)
 parser.add_argument('--steps_per_log', type=int, default=1)
@@ -118,8 +118,6 @@ def train_model(model, optimizer, scheduler, num_epochs):
 
     model_weights = model.state_dict()
 
-    save_network(model, 0)
-
     st_time = time.time()
 
     criterion = nn.CrossEntropyLoss()
@@ -164,7 +162,7 @@ def train_model(model, optimizer, scheduler, num_epochs):
             #################################################
             loss, p_inds, n_inds, dist_ap, dist_an, dist_mat = global_loss(
                tri_loss, global_feat=outputs_f, global_feat1=outputs_sf, labels=labels,
-               normalize_feature=True) 
+               normalize_feature=False) 
 
             #################################################
 
@@ -226,10 +224,8 @@ def train_model(model, optimizer, scheduler, num_epochs):
         log = time_log + tri_log
         print(log)
 
-
-
         # model.load_state_dict(model_weights)
-        if (epoch + 1) % 10 == 0:
+        if epoch % 100 == 0:
             save_network(model, epoch)
 
     save_network(model, 'last')

@@ -10,6 +10,31 @@ from contextlib import contextmanager
 import torch
 from torch.autograd import Variable
 
+def normalize1(x, axis=-1):
+  """Normalizing to unit length along the specified dimension.
+  Args:
+    x: pytorch Variable
+  Returns:
+    x: pytorch Variable, same shape as input
+  """
+  y = Variable(torch.zeros(x.size()))
+  y = y.cuda()
+  for i in range(0, x.size(0)):
+    temp = x[i,::]
+    temp = temp.t()
+    temp = 1. * temp / (torch.norm(temp, 2, axis, keepdim=True).expand_as(temp) + 1e-12)
+    y[i,::] = temp.t()
+  return y
+
+def normalize(x, axis=-1):
+  """Normalizing to unit length along the specified dimension.
+  Args:
+    x: pytorch Variable
+  Returns:
+    x: pytorch Variable, same shape as input      
+  """
+  x = 1. * x / (torch.norm(x, 2, axis, keepdim=True).expand_as(x) + 1e-12)
+  return x
 
 def time_str(fmt=None):
   if fmt is None:
