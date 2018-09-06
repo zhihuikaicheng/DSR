@@ -132,13 +132,16 @@ def compute_dist2(array1, array2, type='euclidean'):
     Returns:
         numpy array with shape [m1, m2]
     """
-
+    array1 = torch.FloatTensor(array1)
+    array2 = torch.FloatTensor(array2)
     array1 = normalize(array1, axis=1)
     array2 = normalize(array2, axis=1)
+    array1 = array1.numpy()
+    array2 = array2.numpy()
     assert type in ['cosine', 'euclidean']
     if type == 'cosine':
-        array1 = normalize(array1, axis=1)
-        array2 = normalize(array2, axis=1)
+        # array1 = normalize(array1, axis=1)
+        # array2 = normalize(array2, axis=1)
         dist = np.matmul(array1, array2.T)
         return dist
     else:
