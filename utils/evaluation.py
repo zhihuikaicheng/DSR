@@ -5,7 +5,7 @@ import numpy as np
 import torch
 import pdb
 from sklearn.metrics import average_precision_score
-from utils import normalize, normalize1
+from utils.utils import normalize, normalize1
 
 def to_numpy(tensor):
     if torch.is_tensor(tensor):
