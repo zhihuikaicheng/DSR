@@ -155,17 +155,19 @@ def compute_dist2(array1, array2, type='euclidean'):
     return dist
 
 def dsr_dist(array1, array2, type='euclidean'):
-    array1 = normalize1(array1, axis=1) 
-    array2 = normalize1(array2, axis=1)
+    # array1 = normalize1(array1, axis=1) 
+    # array2 = normalize1(array2, axis=1)
     assert type in ['cosine', 'euclidean']
     if type == 'cosine':
-        array1 = normalize(array1, axis=1)
-        array2 = normalize(array2, axis=1)
+        # array1 = normalize(array1, axis=1)
+        # array2 = normalize(array2, axis=1)
         dist = np.matmul(array1, array2.T)
         return dist
     else:
         x = torch.FloatTensor(array1)
         y = torch.FloatTensor(array2)
+        x = normalize1(x, axis=1)
+        y = normalize1(y, axis=1)
         m = x.size(0)
         n = y.size(0)
         kappa = 0.001
