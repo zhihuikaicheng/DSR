@@ -172,7 +172,7 @@ def dsr_dist(array1, array2, type='euclidean'):
         m = x.size(0)
         n = y.size(0)
         kappa = 0.001
-        dist = torch.zeros(m, n)
+        dist = Variable(torch.zeros(m, n))
         dist = dist.cuda()
         T = kappa * Variable(torch.eye(65))
         T = T.cuda()
@@ -189,6 +189,5 @@ def dsr_dist(array1, array2, type='euclidean'):
                 a = torch.matmul(y1, torch.matmul(Proj_M, x1)) - x1
                 dist[j, i] = torch.pow(a, 2).sum(0).sqrt().mean()
 
-        dist = dist.cpu()
-        dist = dist.numpy()
-    return dist
+        res = dist.data.cpu().numpy()
+    return res
