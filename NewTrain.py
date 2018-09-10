@@ -21,6 +21,7 @@ import os
 import json
 from utils.sampler import RandomIdentitySampler
 from utils.Model import Model
+from utils.SEnet import se_resnet_50
 from model import ft_net
 from utils.TripletLoss import TripletLoss
 from utils.loss import global_loss
@@ -77,8 +78,9 @@ dataloaders = torch.utils.data.DataLoader(image_datasets['train'], batch_size=ar
 y_loss = []
 y_err = []
 
-# model = ft_net(751)
-model = Model()
+#model = ft_net(751)
+#model = Model()
+model = se_resnet_50(True)
 
 os.environ['CUDA_VISIBLE_DEVICES'] = args.sys_device_ids
 
@@ -155,16 +157,17 @@ def train_model(model, optimizer, scheduler, num_epochs):
 
             optimizer.zero_grad()
 
-            outputs_f, outputs_sf = model(inputs)
-
+            #outputs_f, outputs_sf = model(inputs)
+            out = model(inputs)
+            #pdb.set_trace()
             # loss = criterion(logits, labels)
             # _, preds = torch.max(logits.data, 1)
 
             # DSR AND TRIPLET LOSS ADD IN HERE
             #################################################
             loss, p_inds, n_inds, dist_ap, dist_an, dist_mat = global_loss(
-               tri_loss, global_feat=outputs_f, global_feat1=outputs_sf, labels=labels,
-               normalize_feature=True) 
+               tri_loss, global_feat=out, global_feat1=out, labels=labels,
+               normalize_feature=False) 
 
             #################################################
 
