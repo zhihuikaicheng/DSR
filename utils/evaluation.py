@@ -5,6 +5,7 @@ import numpy as np
 import torch
 import pdb
 from sklearn.metrics import average_precision_score
+from torch.autograd import Variable
 from utils.utils import normalize, normalize1
 
 def to_numpy(tensor):
@@ -164,8 +165,8 @@ def dsr_dist(array1, array2, type='euclidean'):
         dist = np.matmul(array1, array2.T)
         return dist
     else:
-        x = torch.FloatTensor(array1)
-        y = torch.FloatTensor(array2)
+        x = Variable(torch.FloatTensor(array1))
+        y = Variable(torch.FloatTensor(array2))
         x = normalize1(x, axis=1)
         y = normalize1(y, axis=1)
         m = x.size(0)
@@ -173,7 +174,7 @@ def dsr_dist(array1, array2, type='euclidean'):
         kappa = 0.001
         dist = torch.zeros(m, n)
         dist = dist.cuda()
-        T = kappa * torch.eye(65)
+        T = kappa * Variable(torch.eye(65))
         T = T.cuda()
         for i in range(0, n):
             if (i%100==0):
